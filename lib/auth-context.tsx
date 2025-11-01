@@ -56,68 +56,77 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
     });
   }, [initialSession?.access_token, initialSession?.refresh_token, supabase]);
 
-  const loadProfile = useCallback(async (nextSession?: Session | null) => {
-    setLoading(true);
-    try {
-      let currentSession = nextSession ?? (await supabase.auth.getSession()).data.session;
-      let nextUser = currentSession?.user ?? null;
+  const loadProfile = useCallback(
+    async (options?: { session?: Session | null; event?: string }) => {
+      setLoading(true);
+      try {
+        let currentSession = options?.session ?? (await supabase.auth.getSession()).data.session;
+        let nextUser = currentSession?.user ?? null;
 
-      if (!nextUser) {
-        const {
-          data: { user: fetchedUser }
-        } = await supabase.auth.getUser();
-        if (fetchedUser) {
-          nextUser = fetchedUser;
-          currentSession = (await supabase.auth.getSession()).data.session;
+        // When the session is absent, attempt to recover it once.
+        if (!nextUser) {
+          const {
+            data: { user: fetchedUser }
+          } = await supabase.auth.getUser();
+          if (fetchedUser) {
+            nextUser = fetchedUser;
+            currentSession = (await supabase.auth.getSession()).data.session;
+          }
         }
-      }
 
-      setSession(currentSession ?? null);
-      setUser(nextUser ?? null);
+        // If we still have no user, only clear state when it's a sign-out event.
+        if (!nextUser) {
+          if (options?.event === 'SIGNED_OUT' || options?.event === 'TOKEN_REFRESHED') {
+            setSession(null);
+            setUser(null);
+            setProfile(null);
+          }
+          setLoading(false);
+          return;
+        }
 
-      if (!nextUser) {
-        setProfile(null);
-        setLoading(false);
-        return;
-      }
+        setSession(currentSession ?? null);
+        setUser(nextUser);
 
-      await ensureProfile(supabase, nextUser);
+        await ensureProfile(supabase, nextUser);
 
-      // Retry logic for profile fetch
-      let profileRow = null;
-      let error = null;
+        // Retry logic for profile fetch
+        let profileRow = null;
+        let error = null;
       
-      for (let i = 0; i < 3; i++) {
-        const result = await supabase
-          .from('profiles')
-          .select('display_name, avatar_url, role')
-          .eq('user_id', nextUser.id)
-          .maybeSingle();
-        
-        profileRow = result.data;
-        error = result.error;
-        
-        if (!error && profileRow) break;
-        if (i < 2) await new Promise(resolve => setTimeout(resolve, 100 * (i + 1)));
-      }
+        for (let i = 0; i < 3; i++) {
+          const result = await supabase
+            .from('profiles')
+            .select('display_name, avatar_url, role')
+            .eq('user_id', nextUser.id)
+            .maybeSingle();
+          
+          profileRow = result.data;
+          error = result.error;
+          
+          if (!error && profileRow) break;
+          if (i < 2) await new Promise((resolve) => setTimeout(resolve, 100 * (i + 1)));
+        }
 
-      if (error) {
-        console.error('Failed to load profile after retries', error);
+        if (error) {
+          console.error('Failed to load profile after retries', error);
+          setProfile(null);
+        } else {
+          setProfile({
+            displayName: profileRow?.display_name ?? null,
+            avatarUrl: profileRow?.avatar_url ?? null,
+            role: profileRow?.role ?? null
+          });
+        }
+      } catch (err) {
+        console.error('Error loading profile:', err);
         setProfile(null);
-      } else {
-        setProfile({
-          displayName: profileRow?.display_name ?? null,
-          avatarUrl: profileRow?.avatar_url ?? null,
-          role: profileRow?.role ?? null
-        });
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Error loading profile:', err);
-      setProfile(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [supabase]);
+    },
+    [supabase]
+  );
 
   const refresh = useCallback(async () => {
     await loadProfile();
@@ -132,7 +141,7 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
       if (!initialSession) {
         await loadProfile();
       } else if (!initialProfile) {
-        await loadProfile(initialSession);
+        await loadProfile({ session: initialSession });
       } else {
         setLoading(false);
       }
@@ -142,11 +151,12 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
       // After initial load, set up auth state listener
       const {
         data: { subscription }
-      } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-        if (isMounted) {
-          console.log('Auth state changed:', _event, nextSession?.user?.email);
-          void loadProfile(nextSession);
+      } = supabase.auth.onAuthStateChange((event, nextSession) => {
+        if (!isMounted) return;
+        if (event === 'INITIAL_SESSION' && !nextSession?.user && (initialSession?.user || user)) {
+          return;
         }
+        void loadProfile({ session: nextSession, event });
       });
       
       listenerCleanup = () => subscription.unsubscribe();
@@ -158,7 +168,7 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
       isMounted = false;
       listenerCleanup?.();
     };
-  }, [initialProfile, initialSession, loadProfile, supabase]);
+  }, [initialProfile, initialSession, loadProfile, supabase, user]);
 
   useEffect(() => {
     if (!user) return;
