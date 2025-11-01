@@ -7,25 +7,18 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get('code');
   const redirectTo = requestUrl.searchParams.get('redirect_to') || '/';
 
-  console.log('[Auth Callback] Processing callback with code:', code ? 'present' : 'missing');
-
   if (code) {
     try {
       const supabase = createSupabaseClientWithCookies(cookies());
       const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
-      console.log('[Auth Callback] Exchange result:', exchangeError ? `error: ${exchangeError.message}` : 'success');
-
       if (exchangeError) {
-        console.error('[Auth Callback] Exchange error:', exchangeError);
         return NextResponse.redirect(`${requestUrl.origin}/?error=oauth_exchange_failed`);
       }
 
       const {
         data: { user }
       } = await supabase.auth.getUser();
-      
-      console.log('[Auth Callback] User after exchange:', user?.id, user?.email);
 
       if (user) {
         try {
@@ -41,8 +34,6 @@ export async function GET(request: NextRequest) {
           const providerAvatar =
             metadata.avatar_url || metadata.picture || null;
 
-          console.log('[Auth Callback] Provider data:', { providerDisplayName, providerAvatar });
-
           if (!profile) {
             // Create new profile with OAuth data
             const insertPayload: Record<string, any> = {
@@ -54,11 +45,8 @@ export async function GET(request: NextRequest) {
             const { error: insertError } = await supabase
               .from('profiles')
               .insert(insertPayload);
-            
-            console.log('[Auth Callback] Profile created:', insertError ? `error: ${insertError.message}` : 'success');
-            
             if (insertError) {
-              console.error('[Auth Callback] Profile insert error:', insertError);
+              console.error('[Auth Callback] Profile insert error:', insertError.message);
             }
           } else {
             // Update existing profile with OAuth data if fields are empty
@@ -75,14 +63,9 @@ export async function GET(request: NextRequest) {
                 .from('profiles')
                 .update(updatePayload)
                 .eq('user_id', user.id);
-              
-              console.log('[Auth Callback] Profile updated:', updateError ? `error: ${updateError.message}` : 'success');
-              
               if (updateError) {
-                console.error('[Auth Callback] Profile update error:', updateError);
+                console.error('[Auth Callback] Profile update error:', updateError.message);
               }
-            } else {
-              console.log('[Auth Callback] No profile updates needed');
             }
           }
         } catch (error) {
@@ -93,14 +76,10 @@ export async function GET(request: NextRequest) {
       console.error('[Auth Callback] Unexpected error:', error);
       return NextResponse.redirect(`${requestUrl.origin}/?error=oauth_callback_failed`);
     }
-  } else {
-    console.log('[Auth Callback] No code parameter provided');
   }
 
   // Redirect with a timestamp to force a cache bust
   const redirectUrl = new URL(`${requestUrl.origin}${redirectTo}`);
   redirectUrl.searchParams.set('_auth', Date.now().toString());
-  
-  console.log('[Auth Callback] Redirecting to:', redirectUrl.toString());
   return NextResponse.redirect(redirectUrl.toString());
 }
