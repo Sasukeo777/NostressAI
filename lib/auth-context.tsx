@@ -109,7 +109,12 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
         }
 
         if (error) {
-          console.error('Failed to load profile after retries', error);
+          console.error('Failed to load profile after retries', {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint
+          });
           setProfile(null);
         } else {
           setProfile({
