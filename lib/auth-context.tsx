@@ -115,7 +115,6 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
             details: error.details,
             hint: error.hint
           });
-          setProfile(null);
         } else {
           setProfile({
             displayName: profileRow?.display_name ?? null,
@@ -124,13 +123,12 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
           });
         }
       } catch (err) {
-        console.error('Error loading profile:', err);
-        setProfile(null);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [supabase]
+      console.error('Error loading profile:', err);
+    } finally {
+      setLoading(false);
+    }
+  },
+  [supabase]
   );
 
   const refresh = useCallback(async () => {
@@ -138,42 +136,29 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
   }, [loadProfile]);
 
   useEffect(() => {
-    // Initial load
-    let isMounted = true;
-    let listenerCleanup: (() => void) | null = null;
-    
-    const initialize = async () => {
-      if (!initialSession) {
-        await loadProfile();
-      } else if (!initialProfile) {
-        await loadProfile({ session: initialSession });
-      } else {
-        setLoading(false);
+    if (!initialSession) {
+      void loadProfile();
+    } else if (!initialProfile) {
+      void loadProfile({ session: initialSession });
+    } else {
+      setLoading(false);
+    }
+  }, [initialProfile, initialSession, loadProfile]);
+
+  useEffect(() => {
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (event === 'INITIAL_SESSION' && !nextSession?.user && initialSession?.user) {
+        return;
       }
-
-      if (!isMounted) return;
-      
-      // After initial load, set up auth state listener
-      const {
-        data: { subscription }
-      } = supabase.auth.onAuthStateChange((event, nextSession) => {
-        if (!isMounted) return;
-        if (event === 'INITIAL_SESSION' && !nextSession?.user && (initialSession?.user || user)) {
-          return;
-        }
-        void loadProfile({ session: nextSession, event });
-      });
-      
-      listenerCleanup = () => subscription.unsubscribe();
-    };
-
-    initialize().catch(console.error);
+      void loadProfile({ session: nextSession, event });
+    });
 
     return () => {
-      isMounted = false;
-      listenerCleanup?.();
+      subscription.unsubscribe();
     };
-  }, [initialProfile, initialSession, loadProfile, supabase, user]);
+  }, [initialSession?.user, loadProfile, supabase]);
 
   useEffect(() => {
     if (!user) return;
