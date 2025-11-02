@@ -34,13 +34,6 @@ export function ProfileMenu({ className }: ProfileMenuProps) {
   }, [pathname]);
 
   useEffect(() => {
-    // Refresh profile when dialog closes (important for OAuth flows)
-    if (!open) {
-      void refresh();
-    }
-  }, [open, refresh]);
-
-  useEffect(() => {
     const handleProfileUpdated = () => {
       void refresh();
     };

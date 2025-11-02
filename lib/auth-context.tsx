@@ -149,39 +149,28 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
     const {
       data: { subscription }
     } = supabase.auth.onAuthStateChange((event, nextSession) => {
-      if (event === 'INITIAL_SESSION' && !nextSession?.user && initialSession?.user) {
-        return;
+      switch (event) {
+        case 'SIGNED_IN':
+        case 'TOKEN_REFRESHED':
+        case 'USER_UPDATED':
+          void loadProfile({ session: nextSession, event });
+          break;
+        case 'SIGNED_OUT':
+          setSession(null);
+          setUser(null);
+          setProfile(null);
+          setLoading(false);
+          break;
+        default:
+          // ignore INITIAL_SESSION and other events
+          break;
       }
-      void loadProfile({ session: nextSession, event });
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [initialSession?.user, loadProfile, supabase]);
-
-  useEffect(() => {
-    if (!user) return;
-    const channel = supabase
-      .channel(`public:profiles:user:${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'profiles',
-          filter: `user_id=eq.${user.id}`
-        },
-        () => {
-          void loadProfile();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [loadProfile, supabase, user]);
+  }, [loadProfile, supabase]);
 
   const value = useMemo<AuthContextValue>(() => ({
     loading,
