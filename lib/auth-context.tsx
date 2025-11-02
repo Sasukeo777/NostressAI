@@ -136,14 +136,35 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
   }, [loadProfile]);
 
   useEffect(() => {
-    if (!initialSession) {
-      void loadProfile();
-    } else if (!initialProfile) {
-      void loadProfile({ session: initialSession });
-    } else {
-      setLoading(false);
+    let active = true;
+    async function bootstrap() {
+      if (initialSession?.access_token && initialSession.refresh_token) {
+        try {
+          await supabase.auth.setSession({
+            access_token: initialSession.access_token,
+            refresh_token: initialSession.refresh_token
+          });
+        } catch (err) {
+          console.error('Failed to restore Supabase session', err);
+        }
+      }
+
+      if (!active) return;
+
+      if (!initialSession) {
+        await loadProfile();
+      } else if (!initialProfile) {
+        await loadProfile({ session: initialSession });
+      } else {
+        setLoading(false);
+      }
     }
-  }, [initialProfile, initialSession, loadProfile]);
+
+    bootstrap().catch((err) => console.error('Auth bootstrap error', err));
+    return () => {
+      active = false;
+    };
+  }, [initialProfile, initialSession, loadProfile, supabase]);
 
   useEffect(() => {
     const {
