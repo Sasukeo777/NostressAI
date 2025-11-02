@@ -44,91 +44,57 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
   const [session, setSession] = useState<Session | null>(initialSession);
   const [user, setUser] = useState<User | null>(initialSession?.user ?? null);
   const [profile, setProfile] = useState<UserProfile | null>(initialProfile);
-  const [loading, setLoading] = useState<boolean>(!initialSession);
+  const [loading, setLoading] = useState<boolean>(initialProfile ? false : !!initialSession);
 
-  useEffect(() => {
-    if (!initialSession?.access_token || !initialSession.refresh_token) {
-      return;
-    }
-    void supabase.auth.setSession({
-      access_token: initialSession.access_token,
-      refresh_token: initialSession.refresh_token
-    });
-  }, [initialSession?.access_token, initialSession?.refresh_token, supabase]);
+  const fetchProfile = useCallback(
+    async (targetSession?: Session | null) => {
+      const currentSession = targetSession ?? (await supabase.auth.getSession()).data.session;
+      const currentUser = currentSession?.user ?? null;
+
+      if (!currentUser) {
+        return null;
+      }
+
+      await ensureProfile(supabase, currentUser);
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('display_name, avatar_url, role')
+        .eq('user_id', currentUser.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Failed to load profile after retries', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        });
+        return null;
+      }
+
+      return {
+        displayName: data?.display_name ?? null,
+        avatarUrl: data?.avatar_url ?? null,
+        role: data?.role ?? null
+      } as UserProfile;
+    },
+    [supabase]
+  );
 
   const loadProfile = useCallback(
-    async (options?: { session?: Session | null; event?: string }) => {
+    async (targetSession?: Session | null) => {
       setLoading(true);
       try {
-        let currentSession = options?.session ?? (await supabase.auth.getSession()).data.session;
-        let nextUser = currentSession?.user ?? null;
-
-        // When the session is absent, attempt to recover it once.
-        if (!nextUser) {
-          const {
-            data: { user: fetchedUser }
-          } = await supabase.auth.getUser();
-          if (fetchedUser) {
-            nextUser = fetchedUser;
-            currentSession = (await supabase.auth.getSession()).data.session;
-          }
+        const nextProfile = await fetchProfile(targetSession);
+        if (nextProfile) {
+          setProfile(nextProfile);
         }
-
-        // If we still have no user, only clear state when it's a sign-out event.
-        if (!nextUser) {
-          if (options?.event === 'SIGNED_OUT' || options?.event === 'TOKEN_REFRESHED') {
-            setSession(null);
-            setUser(null);
-            setProfile(null);
-          }
-          setLoading(false);
-          return;
-        }
-
-        setSession(currentSession ?? null);
-        setUser(nextUser);
-
-        await ensureProfile(supabase, nextUser);
-
-        // Retry logic for profile fetch
-        let profileRow = null;
-        let error = null;
-      
-        for (let i = 0; i < 3; i++) {
-          const result = await supabase
-            .from('profiles')
-            .select('display_name, avatar_url, role')
-            .eq('user_id', nextUser.id)
-            .maybeSingle();
-          
-          profileRow = result.data;
-          error = result.error;
-          
-          if (!error && profileRow) break;
-          if (i < 2) await new Promise((resolve) => setTimeout(resolve, 100 * (i + 1)));
-        }
-
-        if (error) {
-          console.error('Failed to load profile after retries', {
-            message: error.message,
-            code: error.code,
-            details: error.details,
-            hint: error.hint
-          });
-        } else {
-          setProfile({
-            displayName: profileRow?.display_name ?? null,
-            avatarUrl: profileRow?.avatar_url ?? null,
-            role: profileRow?.role ?? null
-          });
-        }
-      } catch (err) {
-      console.error('Error loading profile:', err);
-    } finally {
-      setLoading(false);
-    }
-  },
-  [supabase]
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchProfile]
   );
 
   const refresh = useCallback(async () => {
@@ -136,55 +102,43 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
   }, [loadProfile]);
 
   useEffect(() => {
-    let active = true;
-    async function bootstrap() {
-      if (initialSession?.access_token && initialSession.refresh_token) {
-        try {
-          await supabase.auth.setSession({
-            access_token: initialSession.access_token,
-            refresh_token: initialSession.refresh_token
-          });
-        } catch (err) {
-          console.error('Failed to restore Supabase session', err);
-        }
-      }
-
-      if (!active) return;
-
-      if (!initialSession) {
-        await loadProfile();
-      } else if (!initialProfile) {
-        await loadProfile({ session: initialSession });
-      } else {
+    if (!initialSession) {
+      if (initialProfile) {
         setLoading(false);
+      } else {
+        void loadProfile();
       }
+      return;
     }
 
-    bootstrap().catch((err) => console.error('Auth bootstrap error', err));
-    return () => {
-      active = false;
-    };
-  }, [initialProfile, initialSession, loadProfile, supabase]);
+    setSession(initialSession);
+    setUser(initialSession.user ?? null);
+
+    if (initialProfile) {
+      setLoading(false);
+    } else {
+      void loadProfile(initialSession);
+    }
+  }, [initialProfile, initialSession, loadProfile]);
 
   useEffect(() => {
     const {
       data: { subscription }
-    } = supabase.auth.onAuthStateChange((event, nextSession) => {
-      switch (event) {
-        case 'SIGNED_IN':
-        case 'TOKEN_REFRESHED':
-        case 'USER_UPDATED':
-          void loadProfile({ session: nextSession, event });
-          break;
-        case 'SIGNED_OUT':
-          setSession(null);
-          setUser(null);
-          setProfile(null);
-          setLoading(false);
-          break;
-        default:
-          // ignore INITIAL_SESSION and other events
-          break;
+    } = supabase.auth.onAuthStateChange(async (event, nextSession) => {
+      if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setUser(null);
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
+
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        setSession(nextSession ?? null);
+        setUser(nextSession?.user ?? null);
+        if (nextSession?.user) {
+          await loadProfile(nextSession);
+        }
       }
     });
 
