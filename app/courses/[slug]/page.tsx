@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
 import { PillarBadge } from '@/components/ui/PillarBadge';
 import { listFormations, getFormationBySlug } from '@/lib/server/formations';
+import { Button } from '@/components/ui/Button';
 
 export async function generateStaticParams() {
   const formations = await listFormations();
@@ -35,14 +35,28 @@ export default async function CoursePage({ params }: { params: { slug: string } 
           ))}
         </ol>
       </section>
-      <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-6 bg-neutral-50 dark:bg-neutral-900">
-        <h3 className="font-medium mb-2">Interested?</h3>
-        <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">Leave your email to be notified when registration opens.</p>
-        <form className="flex flex-col sm:flex-row gap-3 max-w-md">
-          <input type="email" placeholder="Your email" className="flex-1 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-4 py-2 text-sm" />
-          <Button type="button">Keep me posted</Button>
-        </form>
-      </div>
+      {formation.ctaUrl ? (
+        <div className="rounded-lg border border-primary-200 dark:border-primary-700/50 bg-primary-50/60 dark:bg-primary-900/10 p-6">
+          <h3 className="font-medium mb-2 text-primary-700 dark:text-primary-200">Ready to start?</h3>
+          <p className="text-sm text-neutral-700 dark:text-neutral-300 mb-4">
+            This course is hosted externally. Continue on Udemy to see the full syllabus and enrol.
+          </p>
+          <Button asChild>
+            <a href={formation.ctaUrl} target="_blank" rel="noopener noreferrer">
+              Open course on Udemy
+            </a>
+          </Button>
+        </div>
+      ) : (
+        <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-6 bg-neutral-50 dark:bg-neutral-900">
+          <h3 className="font-medium mb-2">Interested?</h3>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">Leave your email to be notified when registration opens.</p>
+          <form className="flex flex-col sm:flex-row gap-3 max-w-md">
+            <input type="email" placeholder="Your email" className="flex-1 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-4 py-2 text-sm" />
+            <Button type="button">Keep me posted</Button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

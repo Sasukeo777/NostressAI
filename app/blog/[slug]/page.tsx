@@ -46,7 +46,7 @@ export default async function BlogPost({ params }: { params: { slug: string } })
   if (!compiled) return notFound();
 
   // Build the MDX component from the compiled code function body
-  const { code, meta, excerpt } = compiled;
+  const { code, meta, excerpt, interactiveHtml } = compiled;
   // eslint-disable-next-line no-new-func
   const MDXContent = new Function(String(code))({ ...runtime, components: mdxComponents }).default;
 
@@ -125,6 +125,16 @@ export default async function BlogPost({ params }: { params: { slug: string } })
             }}
           />
           <MDXContent />
+          {interactiveHtml ? (
+            <section className="mt-12 rounded-2xl border border-primary-200/60 dark:border-primary-700/40 bg-primary-50/60 dark:bg-primary-900/10 px-6 py-5">
+              <h2 className="mb-3 text-lg font-semibold text-primary-700 dark:text-primary-200">Interactive version</h2>
+              <div
+                className="interactive-embed space-y-4 overflow-x-auto"
+                // eslint-disable-next-line react/no-danger
+                dangerouslySetInnerHTML={{ __html: interactiveHtml }}
+              />
+            </section>
+          ) : null}
           {meta.interactive && <InteractiveCTA slug={meta.interactive} />}
         </article>
       </ArticleShell>

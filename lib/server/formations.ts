@@ -2,7 +2,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getSupabaseServiceClient } from '@/lib/supabaseClient';
-import type { Formation } from '@/lib/types';
+import type { Formation, AdminFormationSummary } from '@/lib/types';
 
 interface FormationRow {
   id: string;
@@ -13,6 +13,8 @@ interface FormationRow {
   level: string | null;
   modules: unknown;
   status?: string | null;
+  external_url?: string | null;
+  is_listed?: boolean | null;
 }
 
 export async function listFormations(): Promise<Formation[]> {
@@ -35,6 +37,8 @@ export async function listFormations(): Promise<Formation[]> {
   const pivotRows = pivotResult.data ?? [];
   const pillarRows = pillarResult.data ?? [];
 
+  const visibleFormations = formationsData.filter((row) => row.is_listed !== false);
+
   const pillarMap = new Map<string, string>();
   pillarRows.forEach((pillar) => {
     pillarMap.set(pillar.id, pillar.slug);
@@ -49,14 +53,34 @@ export async function listFormations(): Promise<Formation[]> {
     formationPillars.set(pivot.formation_id, list);
   });
 
-  return formationsData.map((row) => mapFormationRow(row, formationPillars.get(row.id)));
+  return visibleFormations.map((row) => mapFormationRow(row, formationPillars.get(row.id)));
+}
+
+export async function listFormationsForAdmin(): Promise<AdminFormationSummary[]> {
+  const supabase = getSupabaseServiceClient();
+  const { data, error } = await supabase
+    .from('formations')
+    .select('id, title, slug, status, is_listed')
+    .order('title', { ascending: true });
+
+  if (error) {
+    throw new Error(`Failed to load formations: ${error.message}`);
+  }
+
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    title: row.title,
+    slug: row.slug,
+    status: (row.status as AdminFormationSummary['status']) ?? 'soon',
+    isListed: row.is_listed !== false
+  }));
 }
 
 export async function getFormationBySlug(slug: string): Promise<Formation | null> {
   const supabase = getSupabaseServiceClient();
 
   const formationRow = await fetchFormationRowBySlug(supabase, slug);
-  if (!formationRow) return null;
+  if (!formationRow || formationRow.is_listed === false) return null;
 
   const [{ data: pivotRows, error: pivotError }, { data: pillarRows, error: pillarError }] = await Promise.all([
     supabase
@@ -97,20 +121,21 @@ function mapFormationRow(row: FormationRow, pillarSlugs?: string[]): Formation {
     status,
     level: (row.level as Formation['level']) ?? undefined,
     outline: modules,
-    pillars: pillarSlugs as Formation['pillars']
+    pillars: pillarSlugs as Formation['pillars'],
+    ctaUrl: row.external_url ?? null
   };
 }
 
 async function fetchFormationRows(supabase: SupabaseClient): Promise<FormationRow[] | null> {
   const { data, error } = await supabase
     .from('formations')
-    .select('id, slug, title, summary, availability, level, modules, status')
+    .select('id, slug, title, summary, availability, level, modules, status, external_url, is_listed')
     .order('title', { ascending: true });
 
   if (error && missingAvailabilityColumn(error)) {
     const fallback = await supabase
       .from('formations')
-      .select('id, slug, title, summary, level, modules, status')
+      .select('id, slug, title, summary, level, modules, status, external_url, is_listed')
       .order('title', { ascending: true });
 
     if (fallback.error) {
@@ -119,7 +144,8 @@ async function fetchFormationRows(supabase: SupabaseClient): Promise<FormationRo
 
     return (fallback.data ?? []).map((row) => ({
       ...row,
-      availability: null
+      availability: null,
+      is_listed: row.is_listed
     }));
   }
 
@@ -133,14 +159,14 @@ async function fetchFormationRows(supabase: SupabaseClient): Promise<FormationRo
 async function fetchFormationRowBySlug(supabase: SupabaseClient, slug: string): Promise<FormationRow | null> {
   const { data, error } = await supabase
     .from('formations')
-    .select('id, slug, title, summary, availability, level, modules, status')
+    .select('id, slug, title, summary, availability, level, modules, status, external_url, is_listed')
     .eq('slug', slug)
     .maybeSingle();
 
   if (error && missingAvailabilityColumn(error)) {
     const fallback = await supabase
       .from('formations')
-      .select('id, slug, title, summary, level, modules, status')
+      .select('id, slug, title, summary, level, modules, status, external_url, is_listed')
       .eq('slug', slug)
       .maybeSingle();
 
@@ -154,7 +180,8 @@ async function fetchFormationRowBySlug(supabase: SupabaseClient, slug: string): 
 
     return {
       ...fallback.data,
-      availability: null
+      availability: null,
+      is_listed: fallback.data.is_listed
     };
   }
 

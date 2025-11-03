@@ -12,6 +12,7 @@ interface ResourceRow {
   tags: string[] | null;
   published_at: string | null;
   status: string | null;
+  is_listed?: boolean | null;
 }
 
 export async function getAllResources(): Promise<ResourceMeta[]> {
@@ -20,7 +21,7 @@ export async function getAllResources(): Promise<ResourceMeta[]> {
   const [resourceResult, pivotResult, pillarResult] = await Promise.all([
     supabase
       .from('resources')
-      .select('id, slug, type, title, excerpt, tags, published_at, status')
+      .select('id, slug, type, title, excerpt, tags, published_at, status, is_listed')
       .order('published_at', { ascending: false }),
     supabase.from('resource_pillars').select('resource_id, pillar_id'),
     supabase.from('pillars').select('id, slug')
@@ -36,7 +37,9 @@ export async function getAllResources(): Promise<ResourceMeta[]> {
     throw new Error(`Failed to load pillars: ${pillarResult.error.message}`);
   }
 
-  const rows = (resourceResult.data ?? []).filter((row) => row.status === 'published');
+  const rows = (resourceResult.data ?? []).filter(
+    (row) => row.status === 'published' && row.is_listed !== false
+  );
   const pivotRows = pivotResult.data ?? [];
   const pillarRows = pillarResult.data ?? [];
 
