@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { PillarBadge } from '@/components/ui/PillarBadge';
 import { listFormations, getFormationBySlug } from '@/lib/server/formations';
-import { Button } from '@/components/ui/Button';
+import { Button, buttonVariants } from '@/components/ui/Button';
 
 export async function generateStaticParams() {
   const formations = await listFormations();
@@ -41,11 +41,14 @@ export default async function CoursePage({ params }: { params: { slug: string } 
           <p className="text-sm text-neutral-700 dark:text-neutral-300 mb-4">
             This course is hosted externally. Continue on Udemy to see the full syllabus and enrol.
           </p>
-          <Button asChild>
-            <a href={formation.ctaUrl} target="_blank" rel="noopener noreferrer">
-              Open course on Udemy
-            </a>
-          </Button>
+          <a
+            href={formation.ctaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ size: 'default', variant: 'default' })}
+          >
+            Open course on Udemy
+          </a>
         </div>
       ) : (
         <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-6 bg-neutral-50 dark:bg-neutral-900">

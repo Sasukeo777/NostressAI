@@ -235,7 +235,7 @@ export async function updateArticle(_: UpdateArticleState, formData: FormData): 
       tags,
       hero_image: heroImage,
       interactive_slug: interactiveSlug,
-      interactive_html,
+      interactive_html: interactiveHtml,
       status,
       published_at: publishedAt,
       body_mdx: body

@@ -11,6 +11,7 @@ import { InteractiveCTA } from '@/components/blog/InteractiveCTA';
 import { PillarBadge } from '@/components/ui/PillarBadge';
 import * as runtime from 'react/jsx-runtime';
 import React from 'react';
+import { formatDateLabel } from '@/lib/utils/formatDate';
 
 export async function generateStaticParams() {
   const posts = await getAllPosts();
@@ -89,7 +90,7 @@ export default async function BlogPost({ params }: { params: { slug: string } })
             {meta.title || params.slug.replace(/-/g, ' ')}
           </h1>
           <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-neutral-500 dark:text-neutral-400">
-            {meta.date && <span>Published on {new Date(meta.date).toLocaleDateString('en-GB')}</span>}
+            {meta.date && <span>Published on {formatDateLabel(meta.date)}</span>}
             {meta.readingTime && <span>{meta.readingTime}</span>}
           </div>
           {meta.pillars && Array.isArray(meta.pillars) && meta.pillars.length > 0 && (

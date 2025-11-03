@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import type { AdminResourceSummary, HolisticPillar } from '@/lib/types';
 import { HOLISTIC_PILLARS } from '@/lib/pillars';
+import { formatDateLabel } from '@/lib/utils/formatDate';
 
 interface ResourceManagerTableProps {
   resources: AdminResourceSummary[];
@@ -233,13 +234,7 @@ export function ResourceManagerTable({ resources, onToggle }: ResourceManagerTab
                     )}
                   </td>
                   <td className="px-4 py-4 text-xs text-neutral-500 dark:text-neutral-400">
-                    {resource.publishedAt
-                      ? new Date(resource.publishedAt).toLocaleDateString('en-GB', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric'
-                        })
-                      : '—'}
+                    {resource.publishedAt ? formatDateLabel(resource.publishedAt) : '—'}
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center justify-end gap-3">

@@ -5,6 +5,7 @@ import { PillarBadge } from '@/components/ui/PillarBadge';
 import { PillarFilters } from '@/components/ui/PillarFilters';
 import type { HolisticPillar } from '@/lib/types';
 import { PILLAR_IDS } from '@/lib/pillars';
+import { formatDateLabel } from '@/lib/utils/formatDate';
 
 export const dynamic = 'force-static';
 
@@ -31,7 +32,7 @@ export default async function BlogIndex({ searchParams }: { searchParams?: { pil
           <li key={p.slug} className="border border-neutral-200 dark:border-neutral-800 rounded-lg p-5 hover:shadow-sm transition-shadow">
             <Link href={`/blog/${p.slug}`} className="block focus:outline-none focus:ring-2 focus:ring-primary-500/50 rounded-md">
               <h2 className="text-xl font-semibold tracking-tight mb-1">{p.title}</h2>
-              <p className="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-500 mb-2">{new Date(p.date).toLocaleDateString('en-GB')}</p>
+              <p className="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-500 mb-2">{formatDateLabel(p.date)}</p>
               {p.excerpt && <p className="text-neutral-700 dark:text-neutral-300 text-sm line-clamp-3">{p.excerpt}</p>}
               {p.pillars && p.pillars.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-2">

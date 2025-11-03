@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 import Link from 'next/link';
 import type { AdminArticleSummary, HolisticPillar } from '@/lib/types';
 import { HOLISTIC_PILLARS } from '@/lib/pillars';
+import { formatDateLabel } from '@/lib/utils/formatDate';
 
 interface ArticleManagerTableProps {
   articles: AdminArticleSummary[];
@@ -184,13 +185,7 @@ export function ArticleManagerTable({ articles, onToggle }: ArticleManagerTableP
                     </span>
                   </td>
                   <td className="px-4 py-4 text-xs text-neutral-500 dark:text-neutral-400">
-                    {article.publishedAt
-                      ? new Date(article.publishedAt).toLocaleDateString('en-GB', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric'
-                        })
-                      : '—'}
+                    {article.publishedAt ? formatDateLabel(article.publishedAt) : '—'}
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center justify-end gap-3">
