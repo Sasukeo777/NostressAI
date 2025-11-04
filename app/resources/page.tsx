@@ -5,7 +5,7 @@ import { PillarFilters } from '@/components/ui/PillarFilters';
 import type { HolisticPillar } from '@/lib/types';
 import { PILLAR_IDS } from '@/lib/pillars';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 export default async function ResourcesPage({ searchParams }: { searchParams?: { pillar?: string } }) {
   const items = await getAllResources();

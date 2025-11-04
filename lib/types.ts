@@ -89,3 +89,29 @@ export interface AdminResourceDetail extends AdminResourceSummary {
   tags?: string[] | null;
   body: string;
 }
+
+export interface AdminContactMessage {
+  id: string;
+  fullName: string;
+  email: string;
+  message: string;
+  consent: boolean;
+  consentAt: string | null;
+  originPath?: string | null;
+  userAgent?: string | null;
+  createdAt: string;
+  updatedAt?: string | null;
+}
+
+export interface AdminNewsletterSignup {
+  id: string;
+  email: string;
+  status: string | null;
+  consent: boolean;
+  consentAt: string | null;
+  sourcePath?: string | null;
+  doubleOptInSentAt?: string | null;
+  confirmedAt?: string | null;
+  createdAt: string;
+  updatedAt?: string | null;
+}

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ManageCookiesButton } from '@/components/legal/ManageCookiesButton';
 
 const primaryLinks = [
   { href: '/approach', label: 'Approach' },
@@ -10,7 +11,11 @@ const primaryLinks = [
 const supportLinks = [
   { href: '/resources', label: 'Resources' },
   { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' }
+  { href: '/contact', label: 'Contact' },
+  { href: '/privacy', label: 'Privacy policy' },
+  { href: '/legal-notice', label: 'Legal notice' },
+  { href: '/terms', label: 'Terms of Service' },
+  { href: '/privacy/california', label: 'California privacy notice' }
 ];
 
 export function Footer() {
@@ -78,7 +83,11 @@ export function Footer() {
         </div>
         <div className="mt-12 flex flex-col gap-4 border-t border-neutral-100/70 pt-6 text-xs text-neutral-500 dark:border-neutral-800/60 dark:text-neutral-400 md:flex-row md:items-center md:justify-between">
           <p>© {year} NoStress AI. All rights reserved.</p>
-          <p className="text-neutral-400 dark:text-neutral-500">Built with intention, backed by research, made for calmer days.</p>
+          <div className="flex flex-wrap items-center gap-4 text-neutral-400 dark:text-neutral-500">
+            <Link href="/privacy" className="transition-colors hover:text-primary-600 dark:hover:text-primary-300">Privacy</Link>
+            <Link href="/legal-notice" className="transition-colors hover:text-primary-600 dark:hover:text-primary-300">Legal</Link>
+            <ManageCookiesButton className="text-left" />
+          </div>
         </div>
       </div>
     </footer>

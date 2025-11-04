@@ -5,6 +5,10 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { AuthProvider } from '@/lib/auth-context';
 import { createSupabaseServerComponentClient } from '@/lib/supabase/auth';
+import { ConsentProvider } from '@/components/legal/ConsentProvider';
+import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
+import { PlausibleScript } from '@/components/analytics/PlausibleScript';
+import { MarketingScripts } from '@/components/marketing/MarketingScripts';
 
 const workSans = Work_Sans({
   subsets: ['latin'],
@@ -70,11 +74,16 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </head>
       <body className="min-h-full flex flex-col font-sans antialiased bg-neutral-25 dark:bg-neutral-900 text-neutral-700 dark:text-neutral-100 transition-colors duration-300">
         <AuthProvider initialSession={session} initialProfile={initialProfile}>
-          <Navbar />
-          <main className="flex-1 py-8">
-            <div className="site-container px-4">{children}</div>
-          </main>
-          <Footer />
+          <ConsentProvider>
+            <PlausibleScript />
+            <MarketingScripts />
+            <Navbar />
+            <main className="flex-1 py-8">
+              <div className="site-container px-4">{children}</div>
+            </main>
+            <Footer />
+            <CookieConsentBanner />
+          </ConsentProvider>
         </AuthProvider>
       </body>
     </html>

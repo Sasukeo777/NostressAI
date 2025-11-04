@@ -19,6 +19,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     { href: '/admin/articles', label: 'Articles' },
     { href: '/admin/courses', label: 'Courses' },
     { href: '/admin/resources', label: 'Resources' },
+    { href: '/admin/messages', label: 'Messages' },
+    { href: '/admin/newsletter', label: 'Newsletter' },
     { href: '/admin/about', label: 'About page' }
   ];
 

@@ -7,7 +7,7 @@ import type { HolisticPillar } from '@/lib/types';
 import { PILLAR_IDS } from '@/lib/pillars';
 import { formatDateLabel } from '@/lib/utils/formatDate';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 export default async function BlogIndex({ searchParams }: { searchParams?: { pillar?: string } }) {
   const posts = await getAllPosts();

@@ -2,18 +2,24 @@ import Link from 'next/link';
 import { listFormations } from '@/lib/server/formations';
 import { getAllPosts } from '@/lib/blog';
 import { getAllResources } from '@/lib/resources';
+import { countContactMessages } from '@/lib/server/contactMessages';
+import { countNewsletterSignups } from '@/lib/server/newsletter';
 
 export default async function AdminPage() {
-  const [formations, posts, resources] = await Promise.all([
+  const [formations, posts, resources, contactCount, newsletterCount] = await Promise.all([
     listFormations(),
     getAllPosts(),
-    getAllResources()
+    getAllResources(),
+    countContactMessages(),
+    countNewsletterSignups()
   ]);
 
   const stats = [
     { label: 'Articles', count: posts.length, href: '/blog' },
     { label: 'Formations', count: formations.length, href: '/courses' },
-    { label: 'Resources', count: resources.length, href: '/resources' }
+    { label: 'Resources', count: resources.length, href: '/resources' },
+    { label: 'Contact messages', count: contactCount, href: '/admin/messages' },
+    { label: 'Newsletter signups', count: newsletterCount, href: '/admin/newsletter' }
   ];
 
   const quickActions = [
@@ -34,6 +40,18 @@ export default async function AdminPage() {
       copy: 'Add a practical tip or study synopsis, tag it with pillars, and surface it on the resource library.',
       cta: 'New resource',
       href: '/admin/resources/new'
+    },
+    {
+      title: 'Review contact inbox',
+      copy: 'Respond to inbound requests, confirm consent, and delete data on demand.',
+      cta: 'Open messages',
+      href: '/admin/messages'
+    },
+    {
+      title: 'Audit newsletter log',
+      copy: 'Track opt-ins, handle unsubscribes, and export compliant mailing lists.',
+      cta: 'Open newsletter',
+      href: '/admin/newsletter'
     },
     {
       title: 'Edit About page',
