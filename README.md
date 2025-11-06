@@ -69,7 +69,7 @@ Your **MDX** content here.
 ## Next steps (ideas)
 - Localise MDX content to English (currently mixed)
 - Hook the contact form to an email service (Resend, Brevo, …)
-- Wire the newsletter to a real provider
+- Newsletter double opt-in flows through Resend. Set `RESEND_API_KEY`, `RESEND_NEWSLETTER_FROM_EMAIL`, and `RESEND_NEWSLETTER_AUDIENCE_ID` to deliver confirmation emails and sync confirmed contacts.
 - Add automated tests (Playwright or Jest) when the product stabilises
 - Enrich each MDX article/resource with `pillars: []` metadata so the holistic map surfaces richer recommendations
 
@@ -91,6 +91,16 @@ Your **MDX** content here.
 5. The `avatars` storage bucket is created by the migrations; if you created the project earlier, ensure a public bucket named `avatars` exists in Supabase Storage.  
 6. Enable the **Google** provider in Supabase Auth and set the callback URL to `<site-url>/auth/callback`.  
 7. Server-side renders use the service client (`lib/supabaseClient.ts`), while server actions/components use the auth-aware helpers in `lib/supabase/auth.ts`.
+
+## Newsletter setup (Resend)
+1. Create a [Resend](https://resend.com) project and verify your sending domain (e.g. `nostress-ai.com`).
+2. Generate an API key with access to emails and audiences, then set the following environment variables:
+   - `RESEND_API_KEY`
+   - `RESEND_NEWSLETTER_FROM_EMAIL` (e.g. `NoStress AI <newsletter@nostress-ai.com>`)
+   - `RESEND_NEWSLETTER_AUDIENCE_ID` (optional; confirmed contacts are pushed to this audience when present).
+3. Ensure `NEXT_PUBLIC_SITE_URL` (or `SITE_URL` on the server) reflects the public site URL so confirmation links resolve correctly.
+4. On subscription, visitors now receive a double opt-in email via Resend. They become active once they confirm through `/newsletter/confirm`.
+5. Confirmed contacts are stored in Supabase **and** mirrored (if configured) inside the Resend audience for campaigns.
 
 ## Admin access
 - Create an email/password user in Supabase Auth and set their `profiles.role` to `admin` via the Supabase dashboard.  

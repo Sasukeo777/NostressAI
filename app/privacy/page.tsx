@@ -90,8 +90,12 @@ const sections = [
           .
         </li>
         <li>
-          <strong>Email provider</strong> – newsletter delivery. We will update this section once the production provider is
-          finalised.
+          <strong>Resend</strong> – transactional and newsletter delivery. Confirmation emails and audience storage are processed
+          via their EU or US infrastructure (depending on your account settings).{' '}
+          <a className="underline" href="https://resend.com/legal/privacy-policy" target="_blank" rel="noreferrer">
+            Privacy policy
+          </a>
+          .
         </li>
         <li>
           <strong>Deployment host</strong> – infrastructure used to serve the Next.js app (e.g. Vercel). Their logs may include IP

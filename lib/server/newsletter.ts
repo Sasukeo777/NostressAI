@@ -1,5 +1,6 @@
 'use server';
 
+import { addContactToNewsletterAudience } from '@/lib/email/newsletter';
 import { getSupabaseServiceClient } from '@/lib/supabaseClient';
 import type { AdminNewsletterSignup } from '@/lib/types';
 
@@ -20,6 +21,13 @@ export interface ListNewsletterOptions {
   search?: string;
   status?: string;
   limit?: number;
+}
+
+export type NewsletterConfirmationStatus = 'missing_token' | 'invalid' | 'already_confirmed' | 'confirmed';
+
+export interface NewsletterConfirmationResult {
+  status: NewsletterConfirmationStatus;
+  email?: string;
 }
 
 export async function listNewsletterSignups(options: ListNewsletterOptions = {}): Promise<AdminNewsletterSignup[]> {
@@ -76,4 +84,57 @@ export async function countNewsletterSignups(): Promise<number> {
   }
 
   return count ?? 0;
+}
+
+export async function confirmNewsletterSubscription(token: string, email?: string): Promise<NewsletterConfirmationResult> {
+  if (!token) {
+    return { status: 'missing_token' };
+  }
+
+  const supabase = getSupabaseServiceClient();
+
+  let builder = supabase
+    .from('newsletter_signups')
+    .select('id, email, status, source_path')
+    .eq('double_opt_in_token', token);
+
+  if (email) {
+    builder = builder.ilike('email', email.toLowerCase());
+  }
+
+  const { data, error } = await builder.maybeSingle();
+
+  if (error) {
+    throw new Error(`Failed to verify newsletter token: ${error.message}`);
+  }
+
+  if (!data) {
+    return { status: 'invalid' };
+  }
+
+  if (data.status === 'confirmed') {
+    return { status: 'already_confirmed', email: data.email };
+  }
+
+  const now = new Date().toISOString();
+  const { error: updateError } = await supabase
+    .from('newsletter_signups')
+    .update({
+      status: 'confirmed',
+      confirmed_at: now,
+      double_opt_in_token: null
+    })
+    .eq('id', data.id);
+
+  if (updateError) {
+    throw new Error(`Failed to confirm newsletter signup: ${updateError.message}`);
+  }
+
+  try {
+    await addContactToNewsletterAudience(data.email);
+  } catch (audienceError) {
+    console.error('[newsletter] Unable to add confirmed contact to Resend audience', audienceError);
+  }
+
+  return { status: 'confirmed', email: data.email };
 }
