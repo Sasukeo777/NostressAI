@@ -102,7 +102,7 @@ export async function addContactToNewsletterAudience(email: string) {
   try {
     await resend.contacts.create({
       email,
-      audienceId,
+      audience_id: audienceId,
       unsubscribed: false
     });
   } catch (error: any) {
