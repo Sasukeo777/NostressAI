@@ -69,7 +69,7 @@ Your **MDX** content here.
 ## Next steps (ideas)
 - Localise MDX content to English (currently mixed)
 - Hook the contact form to an email service (Resend, Brevo, …)
-- Newsletter double opt-in flows through Resend. Set `RESEND_API_KEY`, `RESEND_NEWSLETTER_FROM_EMAIL`, and `RESEND_NEWSLETTER_AUDIENCE_ID` to deliver confirmation emails and sync confirmed contacts.
+- Automate the pillar-based newsletter queue (currently curated manually from the admin export)
 - Add automated tests (Playwright or Jest) when the product stabilises
 - Enrich each MDX article/resource with `pillars: []` metadata so the holistic map surfaces richer recommendations
 
@@ -92,15 +92,38 @@ Your **MDX** content here.
 6. Enable the **Google** provider in Supabase Auth and set the callback URL to `<site-url>/auth/callback`.  
 7. Server-side renders use the service client (`lib/supabaseClient.ts`), while server actions/components use the auth-aware helpers in `lib/supabase/auth.ts`.
 
-## Newsletter setup (Resend)
-1. Create a [Resend](https://resend.com) project and verify your sending domain (e.g. `nostress-ai.com`).
-2. Generate an API key with access to emails and audiences, then set the following environment variables:
-   - `RESEND_API_KEY`
-   - `RESEND_NEWSLETTER_FROM_EMAIL` (e.g. `NoStress AI <newsletter@nostress-ai.com>`)
-   - `RESEND_NEWSLETTER_AUDIENCE_ID` (optional; confirmed contacts are pushed to this audience when present).
-3. Ensure `NEXT_PUBLIC_SITE_URL` (or `SITE_URL` on the server) reflects the public site URL so confirmation links resolve correctly.
-4. On subscription, visitors now receive a double opt-in email via Resend. They become active once they confirm through `/newsletter/confirm`.
-5. Confirmed contacts are stored in Supabase **and** mirrored (if configured) inside the Resend audience for campaigns.
+## Plans & NoStress+
+1. `/pro` explains the public plans:
+   - **NoStress Free** → limited access + in-app pillar alerts (no email).
+   - **NoStress+** → everything unlocked, priority support, and upcoming live labs (no memo included by default).
+   - **Newsletter-only** → €0.99/mo for the memo alone. It’s a standalone subscription.
+2. In `/profile`, members pick 2–3 favourite pillars. These values drive in-app alerts and newsletter segmentation.
+3. `/admin/premium` lets you flip `plan` between `free`, `plus`, and `newsletter`, copy BCC lists, and export CSVs.
+4. The paid newsletter is still hand-crafted: draft the email, BCC the newsletter-only list (and NoStress+ only if you choose to include them), and send via the subdomain mailbox.
+5. Checkout buttons now hit `/api/billing/create-checkout-session`. Configure the Stripe environment variables below so the newsletter (€0.99) and NoStress+ (€5) flows redirect to Stripe Checkout.
+
+## Billing & Stripe
+1. Create two recurring products in Stripe (one for the newsletter, one for NoStress+). Grab their price IDs.
+2. Set the following environment variables:
+   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+   - `STRIPE_SECRET_KEY`
+   - `STRIPE_PRICE_NEWSLETTER`
+   - `STRIPE_PRICE_PLUS`
+   - `STRIPE_WEBHOOK_SECRET` (keep for when we add the webhook endpoint).
+3. `/api/billing/create-checkout-session` requires the user to be signed in. It creates Stripe customers on-demand, stores the `stripe_customer_id` on `profiles`, and writes/upserts the email into `newsletter_signups` for auditing.
+4. After Stripe Checkout redirects back, flip the `plan` inside `/admin/premium` manually until the webhook endpoint is added. (The route already sets `stripe_subscription_status = 'checkout_pending'`.)
+
+## Newsletter setup (manual pillars)
+1. Members choose their pillars on `/profile` and we persist them on `profiles.favorite_pillars`.
+2. Opt-ins still land in `newsletter_signups` with consent metadata. Review/export from `/admin/newsletter`.
+3. When new content lands, filter the export by pillar, craft the message manually (from `news@updates.nostress-ai.com`), and keep your own notes until automation lands.
+
+## Transactional email (Resend)
+Supabase Auth powers passwordless links + verification emails. Configure its SMTP settings to use [Resend](https://resend.com/):
+
+1. In Supabase → Authentication → Email → SMTP Provider, set host `smtp.resend.com`, port `587`, username `resend`, and the password equal to your Resend API key.
+2. Use a verified sender (e.g. `auth@updates.nostress-ai.com`) for `MAIL_FROM_ADDRESS`. Resend’s dashboard walks you through DKIM/SPF.
+3. Click “Send test email” to confirm the connection, and restart the API once the credentials are saved. All auth emails now route through Resend while the marketing/newsletter layer stays manual.
 
 ## Admin access
 - Create an email/password user in Supabase Auth and set their `profiles.role` to `admin` via the Supabase dashboard.  

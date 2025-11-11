@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { HolisticMap } from '@/components/sections/HolisticMap';
+import { CheckoutButton } from '@/components/ui/CheckoutButton';
 
 interface ShowcaseItem {
   title: string;
@@ -129,17 +130,23 @@ export default function HomePage() {
 
       <section className="relative overflow-hidden rounded-[28px] border border-neutral-100 bg-neutral-25 p-10 dark:border-neutral-800/60 dark:bg-neutral-900 md:p-14">
         <div className="relative z-10 max-w-xl space-y-4">
+          <p className="inline-flex items-center gap-2 rounded-full border border-primary-200/50 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-primary-600 dark:border-primary-700/40 dark:bg-primary-900/30 dark:text-primary-200">
+            Weekly memo · €0.99
+          </p>
           <h2 className="font-serif text-2xl font-semibold text-neutral-700 dark:text-neutral-50">One email per week. Zero noise.</h2>
-          <p className="text-neutral-600 dark:text-neutral-300">1 actionable insight + 1 useful prompt + 1 micro reflection on cognitive hygiene.</p>
-          <form className="flex max-w-md flex-col gap-3 sm:flex-row">
-            <input
-              type="email"
-              placeholder="Your email"
-              className="flex-1 rounded-full border border-neutral-200 bg-white/90 px-5 py-2.5 text-sm text-neutral-600 shadow-sm outline-none transition focus:border-primary-300 focus:ring-2 focus:ring-primary-100 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-neutral-100 dark:focus:border-primary-700 dark:focus:ring-primary-800/40"
-            />
-            <Button type="button">Subscribe</Button>
-          </form>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-neutral-400 dark:text-neutral-500">Unsubscribe anytime. No spam.</p>
+          <p className="text-neutral-600 dark:text-neutral-300">
+            1 actionable insight + 1 useful prompt + 1 micro reflection on cognitive hygiene. Subscribe separately for €0.99 whenever
+            you want the distilled briefing.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <CheckoutButton plan="newsletter" size="lg">
+              Join the memo (€0.99)
+            </CheckoutButton>
+            <Link href="/pro" className="text-sm font-semibold text-primary-600 hover:underline">
+              Compare plans →
+            </Link>
+          </div>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-neutral-400 dark:text-neutral-500">Launch pricing · Cancel anytime</p>
         </div>
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_28%,rgba(95,144,139,0.18),transparent_65%),radial-gradient(circle_at_80%_70%,rgba(149,114,87,0.22),transparent_60%)]" />
       </section>

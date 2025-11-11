@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getAuthContext } from '@/lib/auth';
 import { createSupabaseServerComponentClient } from '@/lib/supabase/auth';
 import { ProfileForm } from './ProfileForm';
+import type { AccentChoice, HolisticPillar } from '@/lib/types';
 
 export const metadata = {
   title: 'Your Profile'
@@ -17,7 +18,7 @@ export default async function ProfilePage() {
   const supabase = createSupabaseServerComponentClient();
   const { data: profile } = await supabase
     .from('profiles')
-    .select('display_name, avatar_url')
+    .select('display_name, avatar_url, favorite_pillars, plan, light_accent, dark_accent')
     .eq('user_id', user.id)
     .maybeSingle();
 
@@ -34,6 +35,12 @@ export default async function ProfilePage() {
             avatarUrl={profile?.avatar_url ?? null}
             email={user.email ?? ''}
             role={role}
+            favoritePillars={
+              (Array.isArray(profile?.favorite_pillars) ? profile?.favorite_pillars : []) as HolisticPillar[]
+            }
+            plan={profile?.plan ?? 'free'}
+            lightAccent={(profile?.light_accent ?? 'classic') as AccentChoice}
+            darkAccent={(profile?.dark_accent ?? 'classic') as AccentChoice}
           />
         </div>
       </div>

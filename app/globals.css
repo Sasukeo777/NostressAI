@@ -2,8 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --accent-body-bg: #f8faf8;
+  --accent-body-bg-dark: #040506;
+  --accent-panel-bg: rgba(255, 255, 255, 0.92);
+  --accent-panel-bg-dark: rgba(19, 20, 24, 0.88);
+  --accent-panel-border: rgba(15, 23, 42, 0.08);
+  --accent-panel-border-dark: rgba(255, 255, 255, 0.08);
+  --accent-panel-shadow: 0 24px 45px -35px rgba(39, 58, 54, 0.35);
+  --accent-panel-shadow-hover: 0 32px 55px -35px rgba(39, 58, 54, 0.4);
+  --accent-panel-shadow-dark: 0 28px 50px -35px rgba(0, 0, 0, 0.65);
+  --accent-panel-shadow-hover-dark: 0 32px 60px -35px rgba(0, 0, 0, 0.75);
+}
+
+[data-accent='vivid'] {
+  --accent-body-bg: radial-gradient(circle at 12% 20%, rgba(255, 235, 230, 0.85), transparent 55%),
+    radial-gradient(circle at 80% 0%, rgba(217, 241, 255, 0.9), transparent 52%),
+    #fffdf6;
+  --accent-body-bg-dark: radial-gradient(circle at 15% 15%, rgba(255, 140, 66, 0.25), transparent 45%),
+    radial-gradient(circle at 85% 10%, rgba(99, 179, 237, 0.25), transparent 50%),
+    #030408;
+  --accent-panel-bg: rgba(255, 255, 255, 0.95);
+  --accent-panel-bg-dark: rgba(15, 18, 27, 0.9);
+  --accent-panel-border: rgba(255, 255, 255, 0.55);
+  --accent-panel-border-dark: rgba(255, 255, 255, 0.12);
+  --accent-panel-shadow: 0 30px 60px -40px rgba(39, 58, 54, 0.4);
+  --accent-panel-shadow-hover: 0 38px 70px -40px rgba(39, 58, 54, 0.45);
+  --accent-panel-shadow-dark: 0 32px 60px -38px rgba(0, 0, 0, 0.75);
+  --accent-panel-shadow-hover-dark: 0 38px 70px -35px rgba(0, 0, 0, 0.85);
+}
+
 body {
   font-family: var(--font-sans);
+  background: var(--accent-body-bg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  transition: background 0.8s ease;
+}
+
+html.dark body {
+  background: var(--accent-body-bg-dark);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
 }
 
 .blog-article > p:first-of-type {
@@ -196,6 +238,43 @@ h1, h2, h3, h4 {
 .fade-in-visible {
   opacity: 1 !important;
   transform: translateY(0) !important;
+}
+
+.accent-panel {
+  background: var(--accent-panel-bg);
+  border: 1px solid var(--accent-panel-border);
+  box-shadow: var(--accent-panel-shadow);
+  backdrop-filter: blur(12px);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.accent-panel:hover {
+  box-shadow: var(--accent-panel-shadow-hover);
+}
+
+html.dark .accent-panel {
+  background: var(--accent-panel-bg-dark);
+  border-color: var(--accent-panel-border-dark);
+  box-shadow: var(--accent-panel-shadow-dark);
+}
+
+html.dark .accent-panel:hover {
+  box-shadow: var(--accent-panel-shadow-hover-dark);
+}
+
+.accent-section {
+  background: var(--accent-panel-bg);
+  border: 1px solid var(--accent-panel-border);
+  border-radius: 32px;
+  box-shadow: var(--accent-panel-shadow);
+  backdrop-filter: blur(20px);
+  transition: background 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+html.dark .accent-section {
+  background: var(--accent-panel-bg-dark);
+  border-color: var(--accent-panel-border-dark);
+  box-shadow: var(--accent-panel-shadow-dark);
 }
 
 .site-container {

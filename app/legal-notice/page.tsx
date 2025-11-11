@@ -19,7 +19,7 @@ export default function LegalNoticePage() {
       <div className="mt-12 space-y-10 max-w-3xl text-[15px] leading-relaxed text-neutral-700 dark:text-neutral-200">
         <section className="space-y-2">
           <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-50">Publisher</h2>
-          <p>NoStress AI – independent digital publication specialising in stress reduction and mindful AI. Contact: <a className="underline" href="mailto:legal@nostress.ai">legal@nostress.ai</a>.</p>
+          <p>NoStress AI – independent digital publication specialising in stress reduction and mindful AI. Contact: <a className="underline" href="mailto:legal@nostress-ai.com">legal@nostress-ai.com</a>.</p>
         </section>
         <section className="space-y-2">
           <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-50">Editorial responsibility</h2>
@@ -54,8 +54,8 @@ export default function LegalNoticePage() {
           <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-50">Contact</h2>
           <p>
             For any question regarding legal notices, press, or partnership requests, email{' '}
-            <a className="underline" href="mailto:legal@nostress.ai">
-              legal@nostress.ai
+            <a className="underline" href="mailto:legal@nostress-ai.com">
+              legal@nostress-ai.com
             </a>{' '}
             or use the contact form available on the site.
           </p>

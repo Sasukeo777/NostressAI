@@ -20,7 +20,7 @@ export function Card({ title, description, href, badge, footer, className, pilla
   const content = (
     <div
       className={cn(
-        'group relative flex h-full flex-col rounded-2xl border border-neutral-100/80 bg-white/90 p-6 shadow-[0_18px_40px_-30px_rgba(39,58,54,0.5)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_28px_55px_-32px_rgba(39,58,54,0.45)] dark:border-neutral-800/60 dark:bg-neutral-900/60',
+        'group accent-panel relative flex h-full flex-col rounded-2xl p-6 transition-all duration-200 hover:-translate-y-1',
         className
       )}
     >

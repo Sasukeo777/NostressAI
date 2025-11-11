@@ -1,130 +1,61 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { Mail, Sparkles, Calendar, PhoneCall } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { submitContact, contactInitialState, type ContactActionState } from './actions';
 
-function SubmitButton({ disabled }: { disabled: boolean }) {
-  const { pending } = useFormStatus();
-  let label = 'Send';
-  if (pending) label = 'Sending…';
-  if (disabled) label = 'Message sent ✓';
-  return (
-    <Button type="submit" disabled={pending || disabled}>
-      {label}
-    </Button>
-  );
-}
+const CONTACT_EMAIL = 'contact@nostress-ai.com';
+const MAILTO = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Hello NoStress AI')}`;
+
+const responseHighlights = [
+  { icon: Sparkles, title: 'What we cover', body: 'Speaking requests, partnerships, questions on formations, or custom stress audits for teams.' },
+  { icon: Calendar, title: 'Response time', body: 'We reply within two business days. If it is urgent, mention the timeline in the subject line.' },
+  { icon: PhoneCall, title: 'Prefer async', body: 'We start every conversation by email so you keep a written thread. From there we can book a call if useful.' }
+];
 
 export default function ContactPage() {
-  const formRef = useRef<HTMLFormElement | null>(null);
-  const [state, formAction] = useFormState<ContactActionState, FormData>(submitContact, contactInitialState);
-
-  useEffect(() => {
-    if (state?.success && formRef.current) {
-      formRef.current.reset();
-    }
-  }, [state?.success]);
-
-  useEffect(() => {
-    if (!formRef.current) return;
-    const userAgentInput = formRef.current.querySelector<HTMLInputElement>('input[name="userAgent"]');
-    if (userAgentInput) {
-      userAgentInput.value = navigator.userAgent;
-    }
-  }, []);
-
   return (
-    <div className="space-y-8 max-w-xl">
-      <h1 className="text-3xl font-semibold tracking-tight">Contact</h1>
-      <p className="text-neutral-600 dark:text-neutral-300">
-        Question, collaboration or specific need? Write to me. I usually respond within two business days.
-      </p>
-
-      {state?.success ? (
-        <div className="rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-700/60 dark:bg-emerald-500/10 dark:text-emerald-200">
-          {state.success}
+    <div className="space-y-12 max-w-3xl">
+      <section className="accent-panel rounded-[32px] p-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary-600 dark:text-primary-200">Contact</p>
+        <h1 className="mt-3 font-serif text-3xl font-semibold text-neutral-800 dark:text-neutral-50">Let’s keep it simple.</h1>
+        <p className="mt-4 text-neutral-600 dark:text-neutral-300">
+          Instead of another form, write to us directly. It keeps context in your inbox, lets you attach docs, and saves you from guessing if a message went through.
+        </p>
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <a href={MAILTO}>
+            <Button size="lg" className="gap-2">
+              <Mail className="h-4 w-4" />
+              Email us
+            </Button>
+          </a>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">{CONTACT_EMAIL}</p>
         </div>
-      ) : null}
-      {state?.error ? (
-        <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-600/60 dark:bg-red-500/10 dark:text-red-300">
-          {state.error}
-        </div>
-      ) : null}
+      </section>
 
-      <form ref={formRef} action={formAction} className="space-y-5">
-        <input type="hidden" name="origin" value="/contact" />
-        <input type="hidden" name="userAgent" value="" />
+      <div className="grid gap-6 md:grid-cols-3">
+        {responseHighlights.map((item) => (
+          <article key={item.title} className="accent-panel rounded-2xl p-5 text-sm text-neutral-600 dark:text-neutral-300">
+            <div className="flex items-center gap-3">
+              <span className="rounded-full bg-white/70 p-2 text-neutral-700 shadow-sm dark:bg-neutral-900/50 dark:text-neutral-100">
+                <item.icon className="h-4 w-4" />
+              </span>
+              <p className="font-semibold text-neutral-800 dark:text-neutral-100">{item.title}</p>
+            </div>
+            <p className="mt-3 text-neutral-600 dark:text-neutral-300">{item.body}</p>
+          </article>
+        ))}
+      </div>
 
-        <div>
-          <label className="block text-xs font-medium mb-1 text-neutral-500 dark:text-neutral-300" htmlFor="name">
-            Name
-          </label>
-          <input
-            id="name"
-            name="name"
-            required
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm"
-            aria-invalid={Boolean(state?.fieldErrors?.name)}
-            aria-describedby={state?.fieldErrors?.name ? 'name-error' : undefined}
-          />
-          {state?.fieldErrors?.name && <p id="name-error" className="mt-1 text-xs text-red-500">{state.fieldErrors.name}</p>}
-        </div>
-
-        <div>
-          <label className="block text-xs font-medium mb-1 text-neutral-500 dark:text-neutral-300" htmlFor="email">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm"
-            aria-invalid={Boolean(state?.fieldErrors?.email)}
-            aria-describedby={state?.fieldErrors?.email ? 'email-error' : undefined}
-          />
-          {state?.fieldErrors?.email && <p id="email-error" className="mt-1 text-xs text-red-500">{state.fieldErrors.email}</p>}
-        </div>
-
-        <div>
-          <label className="block text-xs font-medium mb-1 text-neutral-500 dark:text-neutral-300" htmlFor="message">
-            Message
-          </label>
-          <textarea
-            id="message"
-            name="message"
-            rows={5}
-            required
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm"
-            aria-invalid={Boolean(state?.fieldErrors?.message)}
-            aria-describedby={state?.fieldErrors?.message ? 'message-error' : undefined}
-          />
-          {state?.fieldErrors?.message && <p id="message-error" className="mt-1 text-xs text-red-500">{state.fieldErrors.message}</p>}
-        </div>
-
-        <label className="flex items-start gap-3 rounded-lg border border-neutral-200/70 px-3 py-2 text-xs text-neutral-600 transition hover:border-primary-200 dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-primary-500/40">
-          <input
-            type="checkbox"
-            name="consent"
-            required
-            className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500 dark:border-neutral-600 dark:bg-neutral-900"
-            aria-invalid={Boolean(state?.fieldErrors?.consent)}
-          />
-          <span>
-            I consent to NoStress AI processing my details to respond to this request. Learn more in the{' '}
-            <Link href="/privacy" className="underline">
-              Privacy Policy
-            </Link>
-            .
-          </span>
-        </label>
-        {state?.fieldErrors?.consent && <p className="text-xs text-red-500">{state.fieldErrors.consent}</p>}
-
-        <SubmitButton disabled={Boolean(state?.success)} />
-      </form>
+      <section className="accent-panel rounded-[28px] p-8 text-sm text-neutral-600 dark:text-neutral-300">
+        <h2 className="text-xl font-semibold text-neutral-800 dark:text-neutral-50">Need something structured?</h2>
+        <p className="mt-3">
+          For paid audits, in-company trainings, or media interviews, outline the audience, desired outcome, and timeframe. We’ll reply with next steps or a booking link.
+        </p>
+        <p className="mt-4">
+          After we confirm availability, you’ll receive a calendar link in email so we keep the entire thread in one place.
+        </p>
+      </section>
     </div>
   );
 }

@@ -9,6 +9,8 @@ export type HolisticPillar =
   | 'societal-impact'
   | 'purpose';
 
+export type AccentChoice = 'classic' | 'vivid';
+
 export interface BlogMeta {
   slug: string;
   title: string;

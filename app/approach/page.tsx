@@ -11,6 +11,24 @@ export const metadata: Metadata = {
 };
 
 export default function ApproachPage() {
+  const clusters = [
+    {
+      title: 'Regulate the body',
+      description: 'Energy, sleep, and somatic resets keep the nervous system steady.',
+      pillars: ['nutrition', 'sleep', 'mind-body']
+    },
+    {
+      title: 'Refine the systems',
+      description: 'Design workflows, AI guardrails, and tactile buffers that remove friction.',
+      pillars: ['work', 'ai-tools', 'analog-tools']
+    },
+    {
+      title: 'Expand the horizon',
+      description: 'Learning, context, and purpose so small routines ladder up to meaning.',
+      pillars: ['neuroplasticity', 'societal-impact', 'purpose']
+    }
+  ];
+
   return (
     <div className="space-y-16">
       <section className="rounded-[32px] border border-neutral-100 bg-white/90 p-10 shadow-[0_45px_90px_-70px_rgba(39,58,54,0.45)] dark:border-neutral-800/60 dark:bg-neutral-900/70 md:p-16">
@@ -30,30 +48,42 @@ export default function ApproachPage() {
         </div>
       </section>
 
-      <SectionHeading title="The Six Pillars" eyebrow="Holistic Stress Map" />
-      <div className="grid gap-6 md:grid-cols-2">
-        {HOLISTIC_PILLARS.map((pillar) => {
-          const Icon = pillar.icon;
-          return (
-            <article
-              key={pillar.id}
-              className={cn(
-                'rounded-2xl border border-transparent p-6 transition hover:-translate-y-1 hover:shadow-[0_24px_45px_-32px_rgba(39,58,54,0.35)]',
-                pillar.accentLight,
-                pillar.accentDark
-              )}
-            >
-              <div className="flex items-center gap-3">
-                <span className="rounded-full bg-white/70 p-2 text-neutral-600 shadow-sm dark:bg-black/30">
-                  <Icon className="h-5 w-5" />
-                </span>
-                <h2 className="font-serif text-xl font-semibold">{pillar.name}</h2>
-              </div>
-              <p className="mt-3 text-sm font-medium text-neutral-600/90 dark:text-neutral-200/90">{pillar.tagline}</p>
-              <p className="mt-3 text-sm text-neutral-600/90 dark:text-neutral-200/80">{pillar.description}</p>
-            </article>
-          );
-        })}
+      <SectionHeading title="Nine pillars, three mindsets" eyebrow="Holistic Stress Map" />
+      <div className="grid gap-10 lg:grid-cols-3">
+        {clusters.map((cluster) => (
+          <article key={cluster.title} className="accent-panel h-full rounded-[26px] p-6 text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-600 dark:text-primary-200">{cluster.title}</p>
+            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-200">{cluster.description}</p>
+            <div className="mt-5 space-y-4">
+              {cluster.pillars.map((pillarId) => {
+                const pillar = HOLISTIC_PILLARS.find((p) => p.id === pillarId);
+                if (!pillar) return null;
+                const Icon = pillar.icon;
+                return (
+                  <div
+                    key={pillar.id}
+                    className={cn(
+                      'rounded-2xl border border-transparent p-4 text-left transition hover:-translate-y-0.5',
+                      pillar.accentLight,
+                      pillar.accentDark
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="rounded-full bg-white/80 p-2 text-neutral-600 shadow-sm dark:bg-black/30">
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <div>
+                        <p className="text-[0.65rem] uppercase tracking-[0.3em] text-neutral-600/70 dark:text-neutral-200/80">{pillar.name}</p>
+                        <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-50">{pillar.tagline}</p>
+                      </div>
+                    </div>
+                    <p className="mt-3 text-xs text-neutral-600/90 dark:text-neutral-200/80">{pillar.description}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </article>
+        ))}
       </div>
 
       <SectionHeading title="Where to begin" eyebrow="Pick your next step" />

@@ -9,6 +9,9 @@ import { ConsentProvider } from '@/components/legal/ConsentProvider';
 import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
 import { PlausibleScript } from '@/components/analytics/PlausibleScript';
 import { MarketingScripts } from '@/components/marketing/MarketingScripts';
+import type { HolisticPillar, AccentChoice } from '@/lib/types';
+import { PILLAR_IDS } from '@/lib/pillars';
+import { AccentThemeProvider } from '@/lib/accent-theme-context';
 
 const workSans = Work_Sans({
   subsets: ['latin'],
@@ -48,20 +51,40 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     data: { session }
   } = await supabase.auth.getSession();
 
-  let initialProfile: { displayName: string | null; avatarUrl: string | null; role: string | null } | null = null;
+  let initialProfile:
+  | {
+    displayName: string | null;
+    avatarUrl: string | null;
+    role: string | null;
+    favoritePillars: HolisticPillar[];
+    plan: string | null;
+    lightAccent: AccentChoice;
+    darkAccent: AccentChoice;
+  }
+    | null = null;
 
   const user = session?.user ?? null;
   if (user) {
     const { data: profileRow } = await supabase
       .from('profiles')
-      .select('display_name, avatar_url, role')
+      .select('display_name, avatar_url, role, favorite_pillars, plan, light_accent, dark_accent')
       .eq('user_id', user.id)
       .maybeSingle();
+
+    const favoritePillars = Array.isArray(profileRow?.favorite_pillars)
+      ? (profileRow?.favorite_pillars.filter((pillar): pillar is HolisticPillar =>
+          typeof pillar === 'string' && PILLAR_IDS.includes(pillar as HolisticPillar)
+        ) as HolisticPillar[])
+      : [];
 
     initialProfile = {
       displayName: profileRow?.display_name ?? null,
       avatarUrl: profileRow?.avatar_url ?? null,
-      role: profileRow?.role ?? null
+      role: profileRow?.role ?? null,
+      favoritePillars: favoritePillars as HolisticPillar[],
+      plan: profileRow?.plan ?? 'free',
+      lightAccent: (profileRow?.light_accent ?? 'classic') as AccentChoice,
+      darkAccent: (profileRow?.dark_accent ?? 'classic') as AccentChoice
     };
   }
 
@@ -74,16 +97,18 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </head>
       <body className="min-h-full flex flex-col font-sans antialiased bg-neutral-25 dark:bg-neutral-900 text-neutral-700 dark:text-neutral-100 transition-colors duration-300">
         <AuthProvider initialSession={session} initialProfile={initialProfile}>
-          <ConsentProvider>
-            <PlausibleScript />
-            <MarketingScripts />
-            <Navbar />
-            <main className="flex-1 py-8">
-              <div className="site-container px-4">{children}</div>
-            </main>
-            <Footer />
-            <CookieConsentBanner />
-          </ConsentProvider>
+          <AccentThemeProvider>
+            <ConsentProvider>
+              <PlausibleScript />
+              <MarketingScripts />
+              <Navbar />
+              <main className="flex-1 py-8">
+                <div className="site-container px-4">{children}</div>
+              </main>
+              <Footer />
+              <CookieConsentBanner />
+            </ConsentProvider>
+          </AccentThemeProvider>
         </AuthProvider>
       </body>
     </html>

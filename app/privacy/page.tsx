@@ -14,7 +14,7 @@ const sections = [
         <p>
           NoStress AI is a project operated by the NoStress AI team (“we”, “us”, “our”). Our mission is to help knowledge workers
           and families reduce mental load with a holistic, research-backed approach. You can contact us at{' '}
-          <a className="underline" href="mailto:care@nostress.ai">care@nostress.ai</a>.
+          <a className="underline" href="mailto:legal@nostress-ai.com">legal@nostress-ai.com</a>.
         </p>
       </>
     )
@@ -90,8 +90,8 @@ const sections = [
           .
         </li>
         <li>
-          <strong>Resend</strong> – transactional and newsletter delivery. Confirmation emails and audience storage are processed
-          via their EU or US infrastructure (depending on your account settings).{' '}
+          <strong>Resend</strong> – transactional email delivery (e.g., passwordless links, account alerts). Messages are sent via their
+          EU or US infrastructure (depending on your account settings).{' '}
           <a className="underline" href="https://resend.com/legal/privacy-policy" target="_blank" rel="noreferrer">
             Privacy policy
           </a>
@@ -133,8 +133,8 @@ const sections = [
       <>
         <p>
           To exercise any GDPR rights, email{' '}
-          <a className="underline" href="mailto:privacy@nostress.ai">
-            privacy@nostress.ai
+          <a className="underline" href="mailto:legal@nostress-ai.com">
+            legal@nostress-ai.com
           </a>
           . Include the email address associated with your account or submission. We will respond within 30 days and may ask for
           additional information to verify your identity.

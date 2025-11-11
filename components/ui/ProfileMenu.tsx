@@ -78,7 +78,9 @@ export function ProfileMenu({ className }: ProfileMenuProps) {
       setPassword('');
       window.location.href = '/';
     } else {
-      const redirectTo = `${(typeof window !== 'undefined' && window.location.origin) || process.env.NEXT_PUBLIC_SITE_URL || ''}/auth/callback?redirect_to=${encodeURIComponent('/')}`;
+      const origin =
+        (typeof window !== 'undefined' && window.location.origin) || process.env.NEXT_PUBLIC_SITE_URL || '';
+      const redirectTo = `${origin}/auth/callback?redirect_to=${encodeURIComponent('/confirm')}`;
       const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -100,7 +102,10 @@ export function ProfileMenu({ className }: ProfileMenuProps) {
     setPending(true);
     setError(undefined);
     setMessage(undefined);
-    const redirectTo = `${(typeof window !== 'undefined' && window.location.origin) || process.env.NEXT_PUBLIC_SITE_URL || ''}/auth/callback?redirect_to=${encodeURIComponent('/')}`;
+    const origin =
+      (typeof window !== 'undefined' && window.location.origin) || process.env.NEXT_PUBLIC_SITE_URL || '';
+    const postAuthPath = mode === 'signup' ? '/confirm' : '/';
+    const redirectTo = `${origin}/auth/callback?redirect_to=${encodeURIComponent(postAuthPath)}`;
     const options: Parameters<typeof supabase.auth.signInWithOAuth>[0]['options'] = { redirectTo };
     if (mode === 'signup') {
       options.queryParams = { prompt: 'consent' };

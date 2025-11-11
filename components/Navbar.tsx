@@ -12,6 +12,7 @@ const navLinks = [
   { href: '/blog', label: 'Blog' },
   { href: '/videos', label: 'Videos' },
   { href: '/resources', label: 'Resources' },
+  { href: '/pro', label: 'NoStress+' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' }
 ];

@@ -4,11 +4,16 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { Session, User } from '@supabase/supabase-js';
 
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
+import type { HolisticPillar, AccentChoice } from '@/lib/types';
 
 interface UserProfile {
   displayName: string | null;
   avatarUrl: string | null;
   role: string | null;
+  favoritePillars: HolisticPillar[];
+  plan: string | null;
+  lightAccent: AccentChoice;
+  darkAccent: AccentChoice;
 }
 
 interface AuthContextValue {
@@ -59,7 +64,7 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('display_name, avatar_url, role')
+        .select('display_name, avatar_url, role, favorite_pillars, plan, light_accent, dark_accent')
         .eq('user_id', currentUser.id)
         .maybeSingle();
 
@@ -76,7 +81,11 @@ export function AuthProvider({ children, initialSession = null, initialProfile =
       return {
         displayName: data?.display_name ?? null,
         avatarUrl: data?.avatar_url ?? null,
-        role: data?.role ?? null
+        role: data?.role ?? null,
+        favoritePillars: (Array.isArray(data?.favorite_pillars) ? data?.favorite_pillars : []) as HolisticPillar[],
+        plan: data?.plan ?? 'free',
+        lightAccent: (data?.light_accent ?? 'classic') as AccentChoice,
+        darkAccent: (data?.dark_accent ?? 'classic') as AccentChoice
       } as UserProfile;
     },
     [supabase]

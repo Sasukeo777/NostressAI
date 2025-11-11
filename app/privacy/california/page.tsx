@@ -103,8 +103,8 @@ const sections = [
       <>
         <p>
           To exercise your California privacy rights, email{' '}
-          <a className="underline" href="mailto:privacy@nostress.ai">
-            privacy@nostress.ai
+          <a className="underline" href="mailto:legal@nostress-ai.com">
+            legal@nostress-ai.com
           </a>{' '}
           with the subject line “CCPA Request.” Please describe the request (access, deletion, correction) and provide the email address
           associated with your interactions. We will verify your identity before acting on the request, which may require additional
@@ -142,8 +142,8 @@ const sections = [
     body: (
       <p>
         For questions about this notice or how we handle California privacy rights, contact{' '}
-        <a className="underline" href="mailto:privacy@nostress.ai">
-          privacy@nostress.ai
+        <a className="underline" href="mailto:legal@nostress-ai.com">
+          legal@nostress-ai.com
         </a>
         .
       </p>

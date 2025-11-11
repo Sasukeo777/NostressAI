@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" role="img" aria-labelledby="logoTitle logoDesc">
+  <title id="logoTitle">NoStress AI wordmark</title>
+  <desc id="logoDesc">Gradient text reading “NoStress AI” in the same style as the site navigation logo.</desc>
+  <defs>
+    <linearGradient id="nostressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4f7a75" />
+      <stop offset="55%" stop-color="#6b958f" />
+      <stop offset="100%" stop-color="#b08d6c" />
+    </linearGradient>
+  </defs>
+  <text
+    x="0"
+    y="78"
+    font-family="Work Sans, 'Helvetica Neue', Arial, sans-serif"
+    font-size="72"
+    font-weight="600"
+    letter-spacing="-1.5"
+    fill="url(#nostressGradient)"
+  >
+    NoStress AI
+  </text>
+</svg>

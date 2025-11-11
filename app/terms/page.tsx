@@ -130,8 +130,8 @@ const sections = [
     body: (
       <p>
         Questions about these Terms can be sent to{' '}
-        <a className="underline" href="mailto:legal@nostress.ai">
-          legal@nostress.ai
+        <a className="underline" href="mailto:legal@nostress-ai.com">
+          legal@nostress-ai.com
         </a>
         . Please include “Terms of Service” in the subject line for faster routing.
       </p>

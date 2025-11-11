@@ -72,10 +72,10 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:care@nostress.ai"
+                  href="mailto:contact@nostress-ai.com"
                   className="transition-colors hover:text-primary-600 dark:hover:text-primary-300"
                 >
-                  care@nostress.ai
+                  contact@nostress-ai.com
                 </a>
               </li>
             </ul>
