@@ -48,17 +48,16 @@ Your **MDX** content here.
 - Set global metadata and layout tweaks in `app/layout.tsx`
 
 ## Compliance & privacy
-- Privacy and legal notices live at `/privacy` and `/legal-notice`. Keep these pages up to date when the product or processors change.
-- The footer links expose “Privacy”, “Legal”, and a placeholder “Manage cookies” button that will open the consent manager once implemented.
-- Contact messages and newsletter signups are reviewable from `/admin/messages` and `/admin/newsletter`, with CSV exports plus one-click deletion for GDPR requests.
-- For data-subject requests (access/erasure), direct users to `privacy@nostress.ai` (see Privacy Policy) and action the request via the admin tools above.
-- Newsletter/contact forms currently store submissions locally only; wire them to the chosen provider, enable double opt-in, and keep consent timestamps before going live.
-- Terms of Service live at `/terms` and a California-specific privacy notice at `/privacy/california`. Review both with counsel before launch.
+- Privacy and legal notices live at `/privacy`, `/privacy/california`, `/legal-notice`, and `/terms`. Update them whenever processors or contact details change.
+- Footer links expose “Privacy”, “Legal”, and a placeholder “Manage cookies” button that will eventually open the consent manager.
+- Newsletter signups remain reviewable from `/admin/newsletter`; exports include consent timestamps for GDPR handling.
+- For all data-subject requests (access/erasure), route people to `legal@nostress-ai.com` as described in the policies and action the request via the admin tools above.
+- Contact now happens via direct email (`contact@nostress-ai.com`), so there is no stored contact-form data.
 - Add the following CAN-SPAM-compliant footer (or your provider’s equivalent) to every marketing email once the newsletter is wired:
   ```
   You are receiving this email because you opted in at nostress.ai.
   NoStress AI · (add business address) · (city, state, zip)
-  To unsubscribe, click the link in this email or write to privacy@nostress.ai with “Unsubscribe” in the subject line.
+  To unsubscribe, click the link in this email or write to legal@nostress-ai.com with “Unsubscribe” in the subject line.
   ```
 
 ## Analytics & marketing scripts
@@ -67,11 +66,11 @@ Your **MDX** content here.
 - When consent is withdrawn from the manager, both analytics and marketing scripts are removed from the page. If your provider drops cookies, ensure you also clear them via their API on revocation.
 
 ## Next steps (ideas)
-- Localise MDX content to English (currently mixed)
-- Hook the contact form to an email service (Resend, Brevo, …)
-- Automate the pillar-based newsletter queue (currently curated manually from the admin export)
-- Add automated tests (Playwright or Jest) when the product stabilises
-- Enrich each MDX article/resource with `pillars: []` metadata so the holistic map surfaces richer recommendations
+- Localise MDX content to English (currently mixed).
+- Wire up Stripe webhooks in production and add automated plan-change emails.
+- Automate the pillar-based newsletter queue (currently curated manually from the admin export).
+- Add automated tests (Playwright or Jest) when the product stabilises.
+- Enrich each MDX article/resource with `pillars: []` metadata so the holistic map surfaces richer recommendations.
 
 ## Supabase integration
 1. Create a Supabase project and note the project URL plus anon/service keys.  
@@ -95,23 +94,23 @@ Your **MDX** content here.
 ## Plans & NoStress+
 1. `/pro` explains the public plans:
    - **NoStress Free** → limited access + in-app pillar alerts (no email).
-   - **NoStress+** → everything unlocked, priority support, and upcoming live labs (no memo included by default).
+   - **NoStress+** → everything unlocked, priority support, upcoming live labs, and the monthly memo included.
    - **Newsletter-only** → €0.99/mo for the memo alone. It’s a standalone subscription.
 2. In `/profile`, members pick 2–3 favourite pillars. These values drive in-app alerts and newsletter segmentation.
 3. `/admin/premium` lets you flip `plan` between `free`, `plus`, and `newsletter`, copy BCC lists, and export CSVs.
-4. The paid newsletter is still hand-crafted: draft the email, BCC the newsletter-only list (and NoStress+ only if you choose to include them), and send via the subdomain mailbox.
-5. Checkout buttons now hit `/api/billing/create-checkout-session`. Configure the Stripe environment variables below so the newsletter (€0.99) and NoStress+ (€5) flows redirect to Stripe Checkout.
+4. The paid newsletter is still hand-crafted: draft the email, BCC the newsletter-only list (and NoStress+) and send via the subdomain mailbox until ConvertKit automation lands.
+5. Checkout buttons hit `/api/billing/checkout`. Configure the Stripe environment variables below so the newsletter (€0.99) and NoStress+ flows redirect to Stripe Checkout.
 
 ## Billing & Stripe
 1. Create two recurring products in Stripe (one for the newsletter, one for NoStress+). Grab their price IDs.
-2. Set the following environment variables:
+2. Set the following environment variables (Preview + Production):
    - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
    - `STRIPE_SECRET_KEY`
    - `STRIPE_PRICE_NEWSLETTER`
    - `STRIPE_PRICE_PLUS`
-   - `STRIPE_WEBHOOK_SECRET` (keep for when we add the webhook endpoint).
-3. `/api/billing/create-checkout-session` requires the user to be signed in. It creates Stripe customers on-demand, stores the `stripe_customer_id` on `profiles`, and writes/upserts the email into `newsletter_signups` for auditing.
-4. After Stripe Checkout redirects back, flip the `plan` inside `/admin/premium` manually until the webhook endpoint is added. (The route already sets `stripe_subscription_status = 'checkout_pending'`.)
+   - `STRIPE_WEBHOOK_SECRET`
+3. `/api/billing/checkout` requires the user to be signed in. It creates Stripe customers on demand, stores `stripe_customer_id` on `profiles`, and writes/upserts the email into `newsletter_signups` for auditing.
+4. Configure Stripe webhooks (Developers → Webhooks) to point to `<site-url>/api/billing/webhook` and paste the signing secret into `STRIPE_WEBHOOK_SECRET`. This route updates `plan`/subscription status automatically, so no manual admin toggle is needed.
 
 ## Newsletter setup (manual pillars)
 1. Members choose their pillars on `/profile` and we persist them on `profiles.favorite_pillars`.
