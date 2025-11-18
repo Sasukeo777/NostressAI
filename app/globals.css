@@ -278,14 +278,14 @@ html.dark .accent-section {
 }
 
 .site-container {
-  max-width: 1080px;
+  max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
   width: 100%;
 }
 
 @media (min-width: 1536px) {
-  .site-container { max-width: 1200px; }
+  .site-container { max-width: 1400px; }
 }
 
 html.dark {

@@ -44,7 +44,7 @@ export async function createCourse(_: CreateCourseState, formData: FormData): Pr
   const duration = String(formData.get('duration') ?? '').trim() || null;
   const level = String(formData.get('level') ?? '').trim() || null;
   const priceValue = String(formData.get('price') ?? '').trim();
-  const statusInput = String(formData.get('status') ?? 'soon');
+  const availabilityInput = String(formData.get('status') ?? 'soon');
 
   const fieldErrors: Record<string, string> = {};
 
@@ -71,7 +71,9 @@ export async function createCourse(_: CreateCourseState, formData: FormData): Pr
     price = parsed;
   }
 
-  const status = statusInput === 'available' || statusInput === 'prelaunch' ? statusInput : 'soon';
+  const availability: 'available' | 'prelaunch' | 'soon' =
+    availabilityInput === 'available' || availabilityInput === 'prelaunch' ? availabilityInput : 'soon';
+  const publicationStatus: 'draft' | 'published' | 'archived' = 'published';
 
   const supabase = getSupabaseServiceClient();
 
@@ -99,7 +101,8 @@ export async function createCourse(_: CreateCourseState, formData: FormData): Pr
       duration,
       price,
       modules,
-      status,
+      status: publicationStatus,
+      availability,
       external_url: ctaUrl
     })
     .select('id')
