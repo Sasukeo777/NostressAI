@@ -95,7 +95,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <link rel="apple-touch-icon" href="/favicon.svg" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="min-h-full flex flex-col font-sans antialiased bg-neutral-25 dark:bg-neutral-900 text-neutral-700 dark:text-neutral-100 transition-colors duration-300">
+      <body className="min-h-full flex flex-col font-sans antialiased bg-neutral-25 dark:bg-black text-neutral-700 dark:text-neutral-100 transition-colors duration-300">
         <AuthProvider initialSession={session} initialProfile={initialProfile}>
           <AccentThemeProvider>
             <ConsentProvider>

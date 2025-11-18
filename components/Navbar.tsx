@@ -21,14 +21,14 @@ export function Navbar() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-neutral-100/80 bg-neutral-25/80 backdrop-blur-lg supports-[backdrop-filter]:bg-neutral-25/80 dark:border-neutral-800/60 dark:bg-neutral-900/70">
+    <header className="sticky top-0 z-50 border-b border-neutral-100/80 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/85 dark:border-neutral-900/70 dark:bg-black/95 dark:supports-[backdrop-filter]:bg-black/90">
       <div className="site-container relative flex h-16 items-center justify-center px-4">
         <div className="absolute inset-y-0 left-4 flex items-center md:left-6">
           <MobileMenu links={navLinks} />
         </div>
         <nav aria-label="Primary navigation" className="flex flex-col items-center">
-          <Link href="/" className="relative mb-1 inline-flex items-center font-semibold text-lg tracking-tight text-neutral-700 dark:text-neutral-100">
-            <span className="bg-gradient-to-r from-primary-600 via-primary-500 to-accent-400 bg-clip-text text-transparent">NoStress AI</span>
+          <Link href="/" className="relative mb-1 inline-flex items-center font-semibold text-lg tracking-tight text-neutral-800 dark:text-white">
+            <span className="bg-gradient-to-r from-primary-600 via-primary-500 to-accent-400 bg-clip-text text-transparent dark:from-primary-300 dark:via-primary-200 dark:to-accent-200">NoStress AI</span>
           </Link>
           <ul className="hidden gap-2 text-sm font-medium md:flex">
             {navLinks.map((l) => {
@@ -39,8 +39,8 @@ export function Navbar() {
                     href={l.href}
                     className={`rounded-full px-3.5 py-1.5 transition-colors ${
                       active
-                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-800/40 dark:text-primary-200'
-                        : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800/60 dark:hover:text-neutral-100'
+                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-700/40 dark:text-white dark:ring-1 dark:ring-primary-500/60'
+                        : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-neutral-800/70'
                     }`}
                   >
                     {l.label}

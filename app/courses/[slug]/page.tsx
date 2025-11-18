@@ -1,13 +1,10 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { PillarBadge } from '@/components/ui/PillarBadge';
-import { listFormations, getFormationBySlug } from '@/lib/server/formations';
+import { getFormationBySlug } from '@/lib/server/formations';
 import { Button, buttonVariants } from '@/components/ui/Button';
 
-export async function generateStaticParams() {
-  const formations = await listFormations();
-  return formations.map((formation) => ({ slug: formation.slug }));
-}
+export const dynamic = 'force-dynamic';
 
 export default async function CoursePage({ params }: { params: { slug: string } }) {
   const formation = await getFormationBySlug(params.slug);
@@ -45,7 +42,7 @@ export default async function CoursePage({ params }: { params: { slug: string } 
             href={formation.ctaUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className={buttonVariants({ size: 'default', variant: 'default' })}
+            className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full bg-primary-600 px-6 text-sm font-medium tracking-tight text-white shadow-[0_18px_32px_-20px_rgba(79,122,117,0.8)] transition-colors duration-200 hover:bg-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 dark:bg-primary-500 dark:hover:bg-primary-400"
           >
             Open course on Udemy
           </a>

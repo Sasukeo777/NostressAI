@@ -4,15 +4,15 @@
 
 :root {
   --accent-body-bg: #f8faf8;
-  --accent-body-bg-dark: #040506;
+  --accent-body-bg-dark: #000000;
   --accent-panel-bg: rgba(255, 255, 255, 0.92);
-  --accent-panel-bg-dark: rgba(19, 20, 24, 0.88);
+  --accent-panel-bg-dark: rgba(0, 0, 0, 0.92);
   --accent-panel-border: rgba(15, 23, 42, 0.08);
-  --accent-panel-border-dark: rgba(255, 255, 255, 0.08);
+  --accent-panel-border-dark: rgba(255, 255, 255, 0.16);
   --accent-panel-shadow: 0 24px 45px -35px rgba(39, 58, 54, 0.35);
   --accent-panel-shadow-hover: 0 32px 55px -35px rgba(39, 58, 54, 0.4);
-  --accent-panel-shadow-dark: 0 28px 50px -35px rgba(0, 0, 0, 0.65);
-  --accent-panel-shadow-hover-dark: 0 32px 60px -35px rgba(0, 0, 0, 0.75);
+  --accent-panel-shadow-dark: 0 32px 70px -40px rgba(0, 0, 0, 0.9);
+  --accent-panel-shadow-hover-dark: 0 40px 80px -38px rgba(0, 0, 0, 0.95);
 }
 
 [data-accent='vivid'] {

@@ -21,17 +21,17 @@ const supportLinks = [
 export function Footer() {
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-24 border-t border-neutral-100/80 bg-neutral-25/90 backdrop-blur dark:border-neutral-800/60 dark:bg-neutral-900/70">
-      <div className="site-container px-4 py-14 text-sm text-neutral-500 dark:text-neutral-400">
+    <footer className="mt-24 border-t border-neutral-100/80 bg-neutral-25/90 backdrop-blur supports-[backdrop-filter]:bg-neutral-25/85 dark:border-neutral-900/70 dark:bg-black/95 dark:supports-[backdrop-filter]:bg-black/90">
+      <div className="site-container px-4 py-14 text-sm text-neutral-600 dark:text-neutral-200">
         <div className="grid gap-10 md:grid-cols-[1.25fr_1fr_1fr]">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary-600 dark:text-primary-400">NoStress AI</p>
-            <p className="mt-4 text-[15px] leading-relaxed text-neutral-600 dark:text-neutral-200">
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary-600 dark:text-primary-300">NoStress AI</p>
+            <p className="mt-4 text-[15px] leading-relaxed text-neutral-700 dark:text-neutral-200">
               Holistic stress relief for modern families. We blend neuroscience, mindful routines, and intentional AI tools so you can build calmer systems at home and work.
             </p>
           </div>
           <nav aria-labelledby="footer-site-nav">
-            <p id="footer-site-nav" className="text-xs font-semibold uppercase tracking-[0.25em] text-neutral-500 dark:text-neutral-300">
+            <p id="footer-site-nav" className="text-xs font-semibold uppercase tracking-[0.25em] text-neutral-500 dark:text-neutral-400">
               Explore
             </p>
             <ul className="mt-4 space-y-3">
@@ -39,7 +39,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="transition-colors hover:text-primary-600 dark:hover:text-primary-300"
+                    className="transition-colors text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white"
                   >
                     {link.label}
                   </Link>
@@ -48,7 +48,7 @@ export function Footer() {
             </ul>
           </nav>
           <nav aria-labelledby="footer-support-nav">
-            <p id="footer-support-nav" className="text-xs font-semibold uppercase tracking-[0.25em] text-neutral-500 dark:text-neutral-300">
+            <p id="footer-support-nav" className="text-xs font-semibold uppercase tracking-[0.25em] text-neutral-500 dark:text-neutral-400">
               Support
             </p>
             <ul className="mt-4 space-y-3">
@@ -56,7 +56,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="transition-colors hover:text-primary-600 dark:hover:text-primary-300"
+                    className="transition-colors text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white"
                   >
                     {link.label}
                   </Link>
@@ -65,7 +65,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/login"
-                  className="transition-colors hover:text-primary-600 dark:hover:text-primary-300"
+                  className="transition-colors text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white"
                 >
                   Admin login
                 </Link>
@@ -73,7 +73,7 @@ export function Footer() {
               <li>
                 <a
                   href="mailto:contact@nostress-ai.com"
-                  className="transition-colors hover:text-primary-600 dark:hover:text-primary-300"
+                  className="transition-colors text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white"
                 >
                   contact@nostress-ai.com
                 </a>
@@ -81,11 +81,11 @@ export function Footer() {
             </ul>
           </nav>
         </div>
-        <div className="mt-12 flex flex-col gap-4 border-t border-neutral-100/70 pt-6 text-xs text-neutral-500 dark:border-neutral-800/60 dark:text-neutral-400 md:flex-row md:items-center md:justify-between">
+        <div className="mt-12 flex flex-col gap-4 border-t border-neutral-100/70 pt-6 text-xs text-neutral-500 dark:border-neutral-900/70 dark:text-neutral-400 md:flex-row md:items-center md:justify-between">
           <p>© {year} NoStress AI. All rights reserved.</p>
-          <div className="flex flex-wrap items-center gap-4 text-neutral-400 dark:text-neutral-500">
-            <Link href="/privacy" className="transition-colors hover:text-primary-600 dark:hover:text-primary-300">Privacy</Link>
-            <Link href="/legal-notice" className="transition-colors hover:text-primary-600 dark:hover:text-primary-300">Legal</Link>
+          <div className="flex flex-wrap items-center gap-4 text-neutral-500 dark:text-neutral-400">
+            <Link href="/privacy" className="transition-colors hover:text-neutral-900 dark:hover:text-white">Privacy</Link>
+            <Link href="/legal-notice" className="transition-colors hover:text-neutral-900 dark:hover:text-white">Legal</Link>
             <ManageCookiesButton className="text-left" />
           </div>
         </div>
