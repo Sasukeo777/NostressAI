@@ -15,7 +15,7 @@ const responseHighlights = [
 
 export default function ContactPage() {
   return (
-    <div className="space-y-12 max-w-3xl">
+    <div className="site-container space-y-12 max-w-3xl">
       <section className="accent-panel rounded-[32px] p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary-600 dark:text-primary-200">Contact</p>
         <h1 className="mt-3 font-serif text-3xl font-semibold text-neutral-800 dark:text-neutral-50">Let’s keep it simple.</h1>

@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ProfileActionState, updateProfile } from './actions';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/AvatarFallback';
 import { Button } from '@/components/ui/Button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Check, User, Sparkles, Palette, CreditCard } from 'lucide-react';
 import { PRESET_AVATARS } from '@/lib/profile-presets';
 import { useAuth } from '@/lib/auth-context';
 import { HOLISTIC_PILLARS } from '@/lib/pillars';
@@ -28,91 +29,18 @@ interface ProfileFormProps {
 function SubmitButton({ disabled }: { disabled?: boolean }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending || disabled} className="mt-4 w-full sm:w-auto">
+    <Button
+      type="submit"
+      disabled={pending || disabled}
+      className="w-full sm:w-auto rounded-full px-8"
+      size="lg"
+    >
       {pending ? (
         <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Saving…</span>
       ) : (
-        'Save changes'
+        'Save Changes'
       )}
     </Button>
-  );
-}
-
-interface AccentThemeCardProps {
-  currentLight: AccentChoice;
-  currentDark: AccentChoice;
-  onLightChange: (value: AccentChoice) => void;
-  onDarkChange: (value: AccentChoice) => void;
-}
-
-function AccentThemeCard({ currentLight, currentDark, onLightChange, onDarkChange }: AccentThemeCardProps) {
-  return (
-    <div className="accent-panel p-4 text-sm text-neutral-600 shadow-sm dark:text-neutral-300">
-      <p className="text-xs uppercase tracking-[0.35em] text-neutral-400 dark:text-neutral-500">Accent themes</p>
-      <p className="mt-1 text-base font-semibold text-neutral-900 dark:text-neutral-100">Choose the vibe of highlighted sections.</p>
-      <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-        Pick one look for light mode and another for dark mode. We’ll apply it to sections such as the holistic map.
-      </p>
-      <div className="mt-5 grid gap-6 sm:grid-cols-2">
-        <AccentSwatchGroup
-          label="Light mode"
-          active={currentLight}
-          mode="light"
-          onChange={onLightChange}
-        />
-        <AccentSwatchGroup
-          label="Dark mode"
-          active={currentDark}
-          mode="dark"
-          onChange={onDarkChange}
-        />
-      </div>
-    </div>
-  );
-}
-
-function AccentSwatchGroup({
-  label,
-  active,
-  mode,
-  onChange
-}: {
-  label: string;
-  active: AccentChoice;
-  mode: 'light' | 'dark';
-  onChange: (value: AccentChoice) => void;
-}) {
-  return (
-    <div className="space-y-3">
-      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-neutral-500 dark:text-neutral-400">{label}</p>
-      <div className="grid gap-3">
-        {(Object.entries(ACCENT_SWATCHES) as [AccentChoice, (typeof ACCENT_SWATCHES)[AccentChoice]][]).map(([value, config]) => {
-          const isActive = active === value;
-          return (
-            <button
-              key={`${label}-${value}`}
-              type="button"
-              onClick={() => onChange(value)}
-              className={cn(
-                'rounded-2xl border p-2.5 text-left transition focus:outline-none',
-                isActive
-                  ? 'border-primary-500 ring-2 ring-primary-200 dark:border-primary-400 dark:ring-primary-800/40'
-                  : 'border-neutral-200 hover:border-primary-200 dark:border-neutral-700 dark:hover:border-primary-500/60'
-              )}
-            >
-              <span
-                className={cn(
-                  'block h-10 w-full rounded-lg shadow-inner',
-                  mode === 'light' ? config.lightClass : config.darkClass
-                )}
-              />
-              <span className="mt-2 block text-sm font-semibold text-neutral-800 dark:text-neutral-100">{config.label}</span>
-              <span className="text-[11px] text-neutral-500 dark:text-neutral-400">{config.description}</span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 
@@ -174,20 +102,6 @@ export function ProfileForm({
   }, [avatarUrl, displayName, favoritePillars, lightAccent, darkAccent]);
 
   useEffect(() => {
-    if (state.error) {
-      if (state.favoritePillars) {
-        setSelectedPillars(state.favoritePillars);
-      }
-      if (state.lightAccent) {
-        setLightAccentChoice(state.lightAccent);
-      }
-      if (state.darkAccent) {
-        setDarkAccentChoice(state.darkAccent);
-      }
-    }
-  }, [state.darkAccent, state.error, state.favoritePillars, state.lightAccent]);
-
-  useEffect(() => {
     if (state.success) {
       const nextDisplayName = state.displayName ?? currentDisplayName ?? null;
       const nextAvatarUrl = state.avatarUrl ?? persistedAvatar ?? null;
@@ -203,32 +117,8 @@ export function ProfileForm({
       setDarkAccentChoice(nextDarkAccent);
       setAccentTheme({ light: nextLightAccent, dark: nextDarkAccent });
       void refresh();
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(
-          new CustomEvent('profile:updated', {
-            detail: {
-              displayName: nextDisplayName,
-              avatarUrl: nextAvatarUrl
-            }
-          })
-        );
-      }
     }
-  }, [
-    currentDisplayName,
-    persistedAvatar,
-    refresh,
-    selectedPillars,
-    lightAccentChoice,
-    darkAccentChoice,
-    setAccentTheme,
-    state.avatarUrl,
-    state.displayName,
-    state.favoritePillars,
-    state.lightAccent,
-    state.darkAccent,
-    state.success
-  ]);
+  }, [state.success, refresh, setAccentTheme]);
 
   const initials = useMemo(() => {
     const source = currentDisplayName || email;
@@ -240,18 +130,6 @@ export function ProfileForm({
   }, [currentDisplayName, email]);
 
   const selectionValid = selectedPillars.length >= 2 && selectedPillars.length <= 3;
-  const currentLightAccent = lightAccentChoice;
-  const currentDarkAccent = darkAccentChoice;
-
-  const handleLightAccentChange = (value: AccentChoice) => {
-    setLightAccentChoice(value);
-    setAccentTheme({ light: value, persist: false });
-  };
-
-  const handleDarkAccentChange = (value: AccentChoice) => {
-    setDarkAccentChoice(value);
-    setAccentTheme({ dark: value, persist: false });
-  };
 
   const togglePillar = (pillar: HolisticPillar) => {
     setSelectedPillars((prev) => {
@@ -266,146 +144,234 @@ export function ProfileForm({
   };
 
   return (
-    <form action={formAction} className="space-y-8">
+    <form action={formAction} className="space-y-12">
       <input type="hidden" name="selectedAvatar" value={selectedAvatar} />
-      <div className="accent-panel p-4 text-sm text-neutral-600 dark:text-neutral-300">
-        <p className="text-xs uppercase tracking-[0.35em] text-neutral-400 dark:text-neutral-500">Plan</p>
-        <p className="mt-1 text-base font-semibold text-neutral-900 dark:text-neutral-100">
-          {PLAN_LABELS[plan ?? 'free'] ?? PLAN_LABELS.free}
-        </p>
-        <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-          Free members get in-app pillar alerts. Upgrade to NoStress+ anytime for full library access and upcoming live tools.
-        </p>
-        <Link href="/pro" className="mt-2 inline-flex items-center text-xs font-semibold text-primary-600 hover:underline">
-          View plans →
-        </Link>
-      </div>
-      <AccentThemeCard
-        currentLight={currentLightAccent}
-        currentDark={currentDarkAccent}
-        onLightChange={handleLightAccentChange}
-        onDarkChange={handleDarkAccentChange}
-      />
-      <input type="hidden" name="lightAccent" value={currentLightAccent} />
-      <input type="hidden" name="darkAccent" value={currentDarkAccent} />
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <div className="relative h-24 w-24">
-          <Avatar className="h-full w-full border border-neutral-200 dark:border-neutral-700">
-            {preview ? (
-              <AvatarImage src={preview} alt="Avatar preview" className="h-full w-full object-cover" />
-            ) : (
-              <AvatarFallback className="bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-200 text-lg font-semibold">
-                {initials || '?'}
-              </AvatarFallback>
-            )}
-          </Avatar>
+      <input type="hidden" name="lightAccent" value={lightAccentChoice} />
+      <input type="hidden" name="darkAccent" value={darkAccentChoice} />
+
+      {/* Identity Section */}
+      <section className="space-y-6">
+        <div className="flex items-center gap-3 border-b border-neutral-200 dark:border-white/10 pb-4">
+          <User className="h-5 w-5 text-primary-500" />
+          <h2 className="text-lg font-medium text-neutral-900 dark:text-white">Identity</h2>
         </div>
-        <div className="space-y-3 text-sm text-neutral-600 dark:text-neutral-300">
-          <p className="text-xs uppercase tracking-wide text-neutral-400 dark:text-neutral-500">Choose an avatar</p>
-          <div className="grid grid-cols-5 gap-2 sm:grid-cols-6">
-            {PRESET_AVATARS.map((url) => {
-              const active =
-                selectedAvatar === url ||
-                (selectedAvatar === 'unchanged' && persistedAvatar === url);
-              return (
+
+        <div className="flex flex-col md:flex-row gap-8 items-start">
+          <div className="flex-shrink-0 space-y-4 text-center">
+            <div className="relative h-32 w-32 mx-auto">
+              <Avatar className="h-full w-full border-4 border-white dark:border-neutral-800 shadow-lg">
+                {preview ? (
+                  <AvatarImage src={preview} alt="Avatar preview" className="h-full w-full object-cover" />
+                ) : (
+                  <AvatarFallback className="bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-200 text-2xl font-semibold">
+                    {initials || '?'}
+                  </AvatarFallback>
+                )}
+              </Avatar>
+            </div>
+            <div className="grid grid-cols-5 gap-2">
+              {PRESET_AVATARS.map((url) => (
                 <button
                   key={url}
                   type="button"
-                  onClick={() => {
-                    setSelectedAvatar(url);
-                    setPreview(url);
-                  }}
-                  className={`relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border transition ${
-                    active
-                      ? 'border-primary-500 ring-2 ring-primary-200 dark:border-primary-400 dark:ring-primary-700/40'
-                      : 'border-neutral-200 hover:border-primary-300 dark:border-neutral-700 dark:hover:border-primary-500'
-                  }`}
-                  aria-pressed={active}
+                  onClick={() => { setSelectedAvatar(url); setPreview(url); }}
+                  className={cn(
+                    "relative h-8 w-8 rounded-full overflow-hidden border-2 transition-all hover:scale-110",
+                    (selectedAvatar === url || (selectedAvatar === 'unchanged' && persistedAvatar === url))
+                      ? "border-primary-500 ring-2 ring-primary-200 dark:ring-primary-900"
+                      : "border-transparent hover:border-neutral-300"
+                  )}
                 >
-                  <img src={url} alt="Preset avatar" className="h-full w-full object-cover" />
+                  <img src={url} alt="Avatar option" className="h-full w-full object-cover" />
                 </button>
-              );
-            })}
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedAvatar('none');
-                setPreview(null);
-              }}
-              className={`flex h-12 w-12 items-center justify-center rounded-full border text-xs transition ${
-                selectedAvatar === 'none' || (selectedAvatar === 'unchanged' && !persistedAvatar)
-                  ? 'border-primary-500 ring-2 ring-primary-200 dark:border-primary-400 dark:ring-primary-700/40'
-                  : 'border-neutral-200 hover:border-primary-300 dark:border-neutral-700 dark:hover:border-primary-500'
-              }`}
-            >
-              None
-            </button>
+              ))}
+            </div>
           </div>
-          <p className="text-xs text-neutral-400 dark:text-neutral-500">Select one of the curated avatars or choose none.</p>
-        </div>
-      </div>
 
-      <div className="grid gap-6 sm:max-w-xl">
-        <div className="space-y-2">
-          <label htmlFor="displayName" className="block text-sm font-medium text-neutral-700 dark:text-neutral-100">
-            Display name
-          </label>
-          <input
-            id="displayName"
-            name="displayName"
-            defaultValue={displayName ?? ''}
-            placeholder="Your name"
-            className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
-          />
+          <div className="flex-grow space-y-6 w-full">
+            <div className="space-y-2">
+              <label htmlFor="displayName" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">Display Name</label>
+              <input
+                id="displayName"
+                name="displayName"
+                defaultValue={displayName ?? ''}
+                placeholder="How should we call you?"
+                className="w-full rounded-xl border border-neutral-200 bg-white/50 px-4 py-3 text-neutral-900 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-white/10 dark:bg-black/20 dark:text-white dark:focus:border-primary-400 transition-all"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl bg-neutral-50 dark:bg-white/5 border border-neutral-100 dark:border-white/5">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1">Email</p>
+                <p className="text-sm font-medium text-neutral-900 dark:text-white truncate">{email}</p>
+              </div>
+              <div className="p-4 rounded-xl bg-neutral-50 dark:bg-white/5 border border-neutral-100 dark:border-white/5">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1">Role</p>
+                <p className="text-sm font-medium text-neutral-900 dark:text-white capitalize">{role ?? 'Viewer'}</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="space-y-1 text-sm text-neutral-500 dark:text-neutral-400">
-          <p>Email: <span className="font-medium text-neutral-800 dark:text-neutral-200">{email}</span></p>
-          <p>Role: <span className="font-medium text-neutral-800 dark:text-neutral-200">{role ?? 'viewer'}</span></p>
+      </section>
+
+      {/* Focus Pillars Section */}
+      <section className="space-y-6">
+        <div className="flex items-center gap-3 border-b border-neutral-200 dark:border-white/10 pb-4">
+          <Sparkles className="h-5 w-5 text-primary-500" />
+          <div className="flex-grow">
+            <h2 className="text-lg font-medium text-neutral-900 dark:text-white">Focus Pillars</h2>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">Select 2-3 areas to prioritize in your feed.</p>
+          </div>
+          <span className={cn("text-xs font-medium px-2 py-1 rounded-full", selectionValid ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300")}>
+            {selectedPillars.length} selected
+          </span>
         </div>
-        <div className="space-y-3">
-          <div>
-            <p className="text-sm font-medium text-neutral-700 dark:text-neutral-100">Focus pillars</p>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">
-              Pick 2 or 3 areas you want updates on. When new content is published manually, we’ll prioritise these.
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {HOLISTIC_PILLARS.map((pillar) => {
+            const active = selectedPillars.includes(pillar.id);
+            return (
+              <label
+                key={pillar.id}
+                className={cn(
+                  "group relative flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition-all duration-200",
+                  active
+                    ? "border-primary-500 bg-primary-50/50 dark:border-primary-400 dark:bg-primary-900/20"
+                    : "border-neutral-200 bg-white/50 hover:border-primary-200 dark:border-white/10 dark:bg-white/5 dark:hover:border-white/20"
+                )}
+              >
+                <input
+                  type="checkbox"
+                  name="favoritePillars"
+                  value={pillar.id}
+                  className="sr-only"
+                  checked={active}
+                  onChange={() => togglePillar(pillar.id)}
+                />
+                <div className={cn(
+                  "flex h-5 w-5 items-center justify-center rounded-full border transition-colors",
+                  active ? "border-primary-500 bg-primary-500 text-white" : "border-neutral-300 dark:border-neutral-600"
+                )}>
+                  {active && <Check className="h-3 w-3" />}
+                </div>
+                <span className={cn("text-sm font-medium", active ? "text-primary-900 dark:text-primary-100" : "text-neutral-600 dark:text-neutral-300")}>
+                  {pillar.name}
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Theme Section */}
+      <section className="space-y-6">
+        <div className="flex items-center gap-3 border-b border-neutral-200 dark:border-white/10 pb-4">
+          <Palette className="h-5 w-5 text-primary-500" />
+          <h2 className="text-lg font-medium text-neutral-900 dark:text-white">Appearance</h2>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-6">
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Light Mode</p>
+            <div className="grid gap-3">
+              {(Object.entries(ACCENT_SWATCHES) as [AccentChoice, (typeof ACCENT_SWATCHES)[AccentChoice]][]).map(([value, config]) => (
+                <button
+                  key={`light-${value}`}
+                  type="button"
+                  onClick={() => { setLightAccentChoice(value); setAccentTheme({ light: value, persist: false }); }}
+                  className={cn(
+                    "flex items-center gap-3 rounded-xl border p-3 text-left transition-all",
+                    lightAccentChoice === value
+                      ? "border-primary-500 ring-1 ring-primary-500 bg-primary-50/30 dark:bg-primary-900/10"
+                      : "border-neutral-200 hover:border-neutral-300 dark:border-white/10 dark:hover:border-white/20"
+                  )}
+                >
+                  <div className={cn("h-10 w-10 rounded-lg shadow-sm", config.lightClass)} />
+                  <div>
+                    <p className="text-sm font-medium text-neutral-900 dark:text-white">{config.label}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">{config.description}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Dark Mode</p>
+            <div className="grid gap-3">
+              {(Object.entries(ACCENT_SWATCHES) as [AccentChoice, (typeof ACCENT_SWATCHES)[AccentChoice]][]).map(([value, config]) => (
+                <button
+                  key={`dark-${value}`}
+                  type="button"
+                  onClick={() => { setDarkAccentChoice(value); setAccentTheme({ dark: value, persist: false }); }}
+                  className={cn(
+                    "flex items-center gap-3 rounded-xl border p-3 text-left transition-all",
+                    darkAccentChoice === value
+                      ? "border-primary-500 ring-1 ring-primary-500 bg-primary-50/30 dark:bg-primary-900/10"
+                      : "border-neutral-200 hover:border-neutral-300 dark:border-white/10 dark:hover:border-white/20"
+                  )}
+                >
+                  <div className={cn("h-10 w-10 rounded-lg shadow-sm", config.darkClass)} />
+                  <div>
+                    <p className="text-sm font-medium text-neutral-900 dark:text-white">{config.label}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">{config.description}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Plan Section */}
+      <section className="rounded-2xl bg-neutral-900 dark:bg-white/5 p-6 text-white overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/20 blur-[80px] rounded-full pointer-events-none" />
+        <div className="relative z-10 flex items-start justify-between gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-primary-300 mb-2">
+              <CreditCard className="h-4 w-4" />
+              <span className="text-xs font-bold uppercase tracking-widest">Current Plan</span>
+            </div>
+            <h3 className="text-2xl font-serif font-medium">{PLAN_LABELS[plan ?? 'free'] ?? PLAN_LABELS.free}</h3>
+            <p className="text-neutral-400 text-sm max-w-md">
+              {plan === 'plus'
+                ? "You have full access to all courses, tools, and premium content."
+                : "Upgrade to NoStress+ to unlock the full library of courses and tools."}
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            {HOLISTIC_PILLARS.map((pillar) => {
-              const active = selectedPillars.includes(pillar.id);
-              return (
-                <label
-                  key={pillar.id}
-                  className={`flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                    active
-                      ? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-400 dark:bg-primary-900/40 dark:text-primary-100'
-                      : 'border-neutral-200 text-neutral-500 hover:border-primary-200 dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-primary-500/60'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    name="favoritePillars"
-                    value={pillar.id}
-                    className="sr-only"
-                    checked={active}
-                    onChange={() => togglePillar(pillar.id)}
-                  />
-                  {pillar.name}
-                </label>
-              );
-            })}
-          </div>
-          <p
-            className={`text-xs ${selectionValid ? 'text-neutral-500 dark:text-neutral-400' : 'text-red-500 dark:text-red-400'}`}
+          <Link
+            href="/pro"
+            className="px-4 py-2 rounded-full bg-white text-neutral-900 text-sm font-medium hover:bg-neutral-100 transition-colors"
           >
-            {selectedPillars.length} selected — {selectionValid ? 'perfect' : 'choose exactly 2 or 3 pillars.'}
-          </p>
+            {plan === 'plus' ? 'Manage Subscription' : 'Upgrade Plan'}
+          </Link>
         </div>
+      </section>
+
+      <div className="pt-6 border-t border-neutral-200 dark:border-white/10 flex items-center justify-between">
+        <AnimatePresence>
+          {state.success && (
+            <motion.p
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0 }}
+              className="text-sm text-green-600 dark:text-green-400 flex items-center gap-2"
+            >
+              <Check className="h-4 w-4" />
+              Changes saved successfully
+            </motion.p>
+          )}
+          {state.error && (
+            <motion.p
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0 }}
+              className="text-sm text-red-600 dark:text-red-400"
+            >
+              {state.error}
+            </motion.p>
+          )}
+        </AnimatePresence>
+        <SubmitButton disabled={!selectionValid} />
       </div>
-
-      {state.error && <p className="rounded-md border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>}
-      {state.success && <p className="rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">{state.success}</p>}
-
-      <SubmitButton disabled={!selectionValid} />
     </form>
   );
 }

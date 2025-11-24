@@ -34,7 +34,7 @@ export function ArticleShell({ children, toc, breadcrumb, className }: ArticleSh
   }, []);
 
   return (
-    <div className={clsx('relative', className)} ref={containerRef}>
+    <div className={clsx('relative site-container', className)} ref={containerRef}>
       <div className="flex gap-10">
         <main className="flex-1">
           {breadcrumb && <div className="mb-6 text-sm text-neutral-500 dark:text-neutral-400" aria-label="Breadcrumb">{breadcrumb}</div>}

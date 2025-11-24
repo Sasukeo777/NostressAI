@@ -8,7 +8,7 @@ const videos = [
 
 export default function VideosPage() {
   return (
-    <div className="space-y-10">
+    <div className="site-container space-y-10">
       <SectionHeading title="Videos" eyebrow="Playlists & Demos" />
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {videos.map((v) => (

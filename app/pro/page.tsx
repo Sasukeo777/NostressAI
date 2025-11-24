@@ -31,7 +31,7 @@ const rows = [
 
 export default function ProPage() {
   return (
-    <div className="space-y-16 pb-20">
+    <div className="site-container space-y-16 pb-20">
       <section className="rounded-[32px] border border-neutral-100/70 bg-gradient-to-br from-neutral-25 via-white to-primary-50/60 p-10 shadow-[0_45px_90px_-70px_rgba(39,58,54,0.55)] dark:border-neutral-800/60 dark:from-neutral-950 dark:via-neutral-900 dark:to-primary-950/40 md:p-16">
         <div className="max-w-3xl space-y-6">
           <p className="inline-flex items-center gap-2 rounded-full border border-primary-200/70 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-primary-600 dark:border-primary-700/40 dark:bg-primary-900/30 dark:text-primary-200">

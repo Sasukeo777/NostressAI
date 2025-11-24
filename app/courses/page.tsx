@@ -22,7 +22,7 @@ export default async function CoursesIndex({ searchParams }: { searchParams?: { 
   const filteredFormations = activePillar ? formations.filter((f) => f.pillars?.includes(activePillar)) : formations;
 
   return (
-    <div>
+    <div className="site-container">
       <SectionHeading title="Courses" eyebrow="Programs" />
       <PillarFilters active={activePillar} className="mb-6" />
       {activePillar && filteredFormations.length === 0 && (

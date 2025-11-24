@@ -5,25 +5,25 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium tracking-tight transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 ring-offset-neutral-25 disabled:pointer-events-none disabled:opacity-60',
+  'inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium tracking-wide transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 ring-offset-neutral-50 disabled:pointer-events-none disabled:opacity-60 active:scale-[0.98]',
   {
     variants: {
       variant: {
         default:
-          'bg-primary-600 text-white shadow-[0_18px_32px_-20px_rgba(79,122,117,0.8)] hover:bg-primary-500 focus-visible:bg-primary-500 dark:bg-primary-500 dark:hover:bg-primary-400',
+          'bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-900/20 hover:shadow-primary-900/30 hover:to-primary-600 dark:from-primary-500 dark:to-primary-600',
         secondary:
-          'bg-accent-100 text-neutral-700 hover:bg-accent-200 focus-visible:bg-accent-200 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700',
-        destructive: 'bg-danger text-white hover:bg-danger/90 focus-visible:bg-danger/90',
+          'bg-white text-neutral-700 border border-neutral-200 shadow-sm hover:bg-neutral-50 hover:border-neutral-300 dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-700',
+        destructive: 'bg-danger text-white hover:bg-danger/90 shadow-md shadow-danger/20',
         outline:
-          'border border-primary-200 text-primary-700 bg-white hover:bg-primary-50 focus-visible:bg-primary-50 dark:border-primary-700/40 dark:text-primary-200 dark:bg-transparent dark:hover:bg-primary-900/40',
+          'border-2 border-primary-200 text-primary-700 bg-transparent hover:bg-primary-50 hover:border-primary-300 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-900/20',
         ghost:
-          'text-neutral-600 hover:bg-neutral-50 focus-visible:bg-neutral-50 dark:text-neutral-200 dark:hover:bg-neutral-800/60',
-        link: 'text-primary-600 underline-offset-4 hover:underline dark:text-primary-300',
+          'text-neutral-600 hover:bg-neutral-100/50 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-200',
+        link: 'text-primary-600 underline-offset-4 hover:underline dark:text-primary-400',
       },
       size: {
         default: 'h-11 px-6',
         sm: 'h-9 px-4 text-xs',
-        lg: 'h-12 px-8 text-base',
+        lg: 'h-14 px-8 text-base',
         icon: 'h-10 w-10 rounded-full',
       },
     },
@@ -36,7 +36,7 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
+  VariantProps<typeof buttonVariants> { }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, ...props }, ref) => (

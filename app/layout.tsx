@@ -1,8 +1,8 @@
 import './globals.css';
 import type { ReactNode } from 'react';
 import { Work_Sans, Playfair_Display } from 'next/font/google';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
+import { DockNavbar } from '@/components/layout/DockNavbar';
+import { NatureFooter } from '@/components/layout/NatureFooter';
 import { AuthProvider } from '@/lib/auth-context';
 import { createSupabaseServerComponentClient } from '@/lib/supabase/auth';
 import { ConsentProvider } from '@/components/legal/ConsentProvider';
@@ -52,15 +52,15 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   } = await supabase.auth.getSession();
 
   let initialProfile:
-  | {
-    displayName: string | null;
-    avatarUrl: string | null;
-    role: string | null;
-    favoritePillars: HolisticPillar[];
-    plan: string | null;
-    lightAccent: AccentChoice;
-    darkAccent: AccentChoice;
-  }
+    | {
+      displayName: string | null;
+      avatarUrl: string | null;
+      role: string | null;
+      favoritePillars: HolisticPillar[];
+      plan: string | null;
+      lightAccent: AccentChoice;
+      darkAccent: AccentChoice;
+    }
     | null = null;
 
   const user = session?.user ?? null;
@@ -73,8 +73,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
     const favoritePillars = Array.isArray(profileRow?.favorite_pillars)
       ? (profileRow?.favorite_pillars.filter((pillar): pillar is HolisticPillar =>
-          typeof pillar === 'string' && PILLAR_IDS.includes(pillar as HolisticPillar)
-        ) as HolisticPillar[])
+        typeof pillar === 'string' && PILLAR_IDS.includes(pillar as HolisticPillar)
+      ) as HolisticPillar[])
       : [];
 
     initialProfile = {
@@ -95,18 +95,18 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <link rel="apple-touch-icon" href="/favicon.svg" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="min-h-full flex flex-col font-sans antialiased bg-neutral-25 dark:bg-black text-neutral-700 dark:text-neutral-100 transition-colors duration-300">
+      <body className="min-h-full flex flex-col font-sans antialiased bg-neutral-50 dark:bg-neutral-950 text-neutral-700 dark:text-neutral-100 transition-colors duration-300">
         <AuthProvider initialSession={session} initialProfile={initialProfile}>
           <AccentThemeProvider>
             <ConsentProvider>
+              <DockNavbar />
+              <main className="flex-grow flex flex-col relative z-0">
+                {children}
+              </main>
+              <NatureFooter />
+              <CookieConsentBanner />
               <PlausibleScript />
               <MarketingScripts />
-              <Navbar />
-              <main className="flex-1 py-8">
-                <div className="site-container px-4">{children}</div>
-              </main>
-              <Footer />
-              <CookieConsentBanner />
             </ConsentProvider>
           </AccentThemeProvider>
         </AuthProvider>

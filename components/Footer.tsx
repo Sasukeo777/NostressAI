@@ -5,7 +5,8 @@ const primaryLinks = [
   { href: '/approach', label: 'Approach' },
   { href: '/courses', label: 'Courses' },
   { href: '/blog', label: 'Blog' },
-  { href: '/videos', label: 'Videos' }
+  { href: '/videos', label: 'Videos' },
+  { href: '/pro', label: 'NoStress+' }
 ];
 
 const supportLinks = [

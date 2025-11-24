@@ -10,14 +10,20 @@ interface PillarFiltersProps {
   active?: HolisticPillar;
   className?: string;
   showAll?: boolean;
+  onChange?: (pillar?: HolisticPillar) => void;
 }
 
-export function PillarFilters({ active, className, showAll = true }: PillarFiltersProps) {
+export function PillarFilters({ active, className, showAll = true, onChange }: PillarFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const handleClick = (pillar?: HolisticPillar) => {
+    if (onChange) {
+      onChange(pillar);
+      return;
+    }
+
     const params = new URLSearchParams(searchParams?.toString() ?? '');
     if (!pillar) {
       params.delete('pillar');
