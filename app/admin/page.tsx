@@ -64,7 +64,7 @@ export default async function AdminPage() {
       {/* Header */}
       <div className="flex flex-col gap-2">
         <h1 className="font-serif text-3xl font-medium text-neutral-900 dark:text-white">Dashboard</h1>
-        <p className="text-neutral-600 dark:text-neutral-400">Overview of your platform's content and activity.</p>
+        <p className="text-neutral-600 dark:text-neutral-400">Overview of your platform&apos;s content and activity.</p>
       </div>
 
       {/* Stats Grid */}

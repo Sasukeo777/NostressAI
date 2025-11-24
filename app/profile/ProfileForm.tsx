@@ -118,7 +118,21 @@ export function ProfileForm({
       setAccentTheme({ light: nextLightAccent, dark: nextDarkAccent });
       void refresh();
     }
-  }, [state.success, refresh, setAccentTheme]);
+  }, [
+    state.success,
+    state.displayName,
+    state.avatarUrl,
+    state.favoritePillars,
+    state.lightAccent,
+    state.darkAccent,
+    currentDisplayName,
+    persistedAvatar,
+    selectedPillars,
+    lightAccentChoice,
+    darkAccentChoice,
+    refresh,
+    setAccentTheme
+  ]);
 
   const initials = useMemo(() => {
     const source = currentDisplayName || email;
