@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getAllPosts } from '@/lib/blog';
 import { getPostMdx } from '@/lib/mdx';
-import { mdxComponents } from '@/components/MDXComponents';
+import { mdxComponents } from '@/components/blog/MDXComponents';
 import { ArticleShell } from '@/components/layout/ArticleShell';
 import { MiniTOC } from '@/components/ui/MiniTOC';
 import { ReadingProgress } from '@/components/blog/ReadingProgress';

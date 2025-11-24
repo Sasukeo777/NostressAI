@@ -32,7 +32,7 @@ export function Hero() {
                 <div className="absolute inset-0 opacity-50 dark:opacity-40">
                     <Particles
                         particleColors={['#56827C', '#D4A373', '#E6CCB2']}
-                        particleCount={150}
+                        particleCount={250}
                         particleSpread={10}
                         speed={0.05}
                         particleBaseSize={80}

@@ -10,7 +10,7 @@ import { getAboutContentWithFallback } from '@/lib/server/about';
 import { compile } from '@mdx-js/mdx';
 import remarkGfm from 'remark-gfm';
 import { getHighlighter } from 'shiki';
-import { mdxComponents } from '@/components/MDXComponents';
+import { mdxComponents } from '@/components/blog/MDXComponents';
 
 export const metadata: Metadata = {
   title: 'About | NoStress AI',

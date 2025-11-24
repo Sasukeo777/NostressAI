@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import { cookies } from 'next/headers';
-
+import { stripe } from '@/lib/stripe';
 import { createSupabaseClientWithCookies } from '@/lib/supabase/auth';
 import { getSupabaseServiceClient } from '@/lib/supabaseClient';
 
-const stripeSecret = process.env.STRIPE_SECRET_KEY;
 const stripePriceNewsletter = process.env.STRIPE_PRICE_NEWSLETTER;
 const stripePricePlus = process.env.STRIPE_PRICE_PLUS;
 
@@ -25,7 +23,7 @@ function resolveBaseUrl(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!stripeSecret) {
+  if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json({ error: 'Stripe is not configured.' }, { status: 500 });
   }
 
@@ -72,8 +70,6 @@ export async function POST(request: Request) {
     console.error('[billing] profile error', profileError);
     return NextResponse.json({ error: 'Unable to load profile.' }, { status: 500 });
   }
-
-  const stripe = new Stripe(stripeSecret, { apiVersion: '2023-08-16' });
 
   let stripeCustomerId = profile?.stripe_customer_id ?? null;
   if (!stripeCustomerId) {
