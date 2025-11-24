@@ -58,7 +58,7 @@
     "autoprefixer": "latest",
     "dotenv": "^17.2.3",
     "eslint": "^8.57.0",
-    "eslint-config-next": "^16.0.3",
+    "eslint-config-next": "^14.2.10",
     "eslint-config-prettier": "^9.1.0",
     "postcss": "latest",
     "prettier": "latest",
