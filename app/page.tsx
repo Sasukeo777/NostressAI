@@ -146,19 +146,18 @@ export default function HomePage() {
             <div className="relative z-10 grid gap-12 lg:grid-cols-2 lg:items-center">
               <div className="space-y-8">
                 <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 dark:border-white/10 bg-white/50 dark:bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary-600 dark:text-primary-200 backdrop-blur-sm">
-                  Weekly memo · €0.99
+                  Monthly Newsletter · $0.99
                 </div>
                 <h2 className="font-serif text-4xl font-medium leading-tight md:text-5xl">
-                  One email per week. <br />
+                  One email per month. <br />
                   <span className="text-primary-600 dark:text-primary-300">Zero noise.</span>
                 </h2>
                 <p className="max-w-md text-lg text-neutral-600 dark:text-neutral-400">
-                  1 actionable insight + 1 useful prompt + 1 micro reflection on cognitive hygiene. Subscribe separately for €0.99 whenever
-                  you want the distilled briefing.
+                  Highly structured, low-volume digest featuring <strong>The 5 AI News You Need to Know</strong> + a <strong>Monthly Nostress Article</strong>. Subscribe separately for $0.99 whenever you want the distilled briefing.
                 </p>
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                   <CheckoutButton plan="newsletter" size="lg" className="bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200">
-                    Join the memo (€0.99)
+                    Join the newsletter ($0.99)
                   </CheckoutButton>
                   <Link href="/pro" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white hover:underline">
                     Compare plans →

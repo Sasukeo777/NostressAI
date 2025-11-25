@@ -32,8 +32,9 @@ You need to configure your Stripe account to talk to this application.
 
 1.  **Create Products**:
     - Go to **Products** in your Stripe Dashboard.
-    - Create a product for **NoStress+** (e.g., €5/month). Copy the **Price ID** (starts with `price_...`).
-    - Create a product for **Newsletter** (e.g., €0.99/month). Copy the **Price ID**.
+    - Create a product for **NoStress+** (e.g., $5/month). Copy the **Price ID** (starts with `price_...`).
+    - Create a product for **Newsletter** (e.g., $0.99/month). Copy the **Price ID**.
+    - Create a product for **Lifetime Access** (e.g., $149 one-time). Copy the **Price ID**.
 
 2.  **Get API Keys**:
     - Go to **Developers > API keys**.
