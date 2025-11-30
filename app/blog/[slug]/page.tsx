@@ -49,6 +49,12 @@ export default async function BlogPost({ params }: { params: { slug: string } })
 
   // Build the MDX component from the compiled code function body
   const { code, meta, excerpt, interactiveHtml } = compiled;
+
+  console.log(`[BlogPost Debug] Slug: ${params.slug}`);
+  console.log(`[BlogPost Debug] interactiveHtml present:`, !!interactiveHtml);
+  console.log(`[BlogPost Debug] interactiveHtml length:`, interactiveHtml?.length);
+  console.log(`[BlogPost Debug] meta.interactive:`, meta.interactive);
+
   // eslint-disable-next-line no-new-func
   const MDXContent = new Function(String(code))({ ...runtime, components: mdxComponents }).default;
 
@@ -146,7 +152,7 @@ export default async function BlogPost({ params }: { params: { slug: string } })
           />
           <MDXContent />
 
-          {interactiveHtml ? (
+          {(interactiveHtml || meta.interactive) ? (
             <section className="mt-16 mb-12 flex flex-col items-center justify-center rounded-[3rem] border border-primary-200/60 dark:border-primary-700/40 bg-gradient-to-b from-primary-50/60 to-transparent dark:from-primary-900/10 dark:to-transparent px-6 py-20 text-center shadow-[inset_0_0_60px_-10px_rgba(var(--primary-500),0.1)] relative overflow-hidden">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-500),0.05),transparent_70%)] pointer-events-none" />
               <h2 className="mb-4 text-2xl font-serif font-medium text-primary-800 dark:text-primary-100">
@@ -155,10 +161,12 @@ export default async function BlogPost({ params }: { params: { slug: string } })
               <p className="mb-8 max-w-md text-neutral-600 dark:text-neutral-300">
                 We&apos;ve built an interactive playground for you to experiment with the concepts from this article.
               </p>
-              <InteractiveArticleModal htmlContent={interactiveHtml} />
+              <InteractiveArticleModal
+                htmlContent={interactiveHtml}
+                iframeUrl={meta.interactive ? `/interactive/${meta.interactive}` : null}
+              />
             </section>
           ) : null}
-          {meta.interactive && <InteractiveCTA slug={meta.interactive} />}
         </article>
       </ArticleShell>
       <BackToTop />

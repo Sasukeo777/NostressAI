@@ -6,11 +6,14 @@ import { Sparkles, Play } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
 interface InteractiveArticleModalProps {
-    htmlContent: string;
+    htmlContent?: string | null;
+    iframeUrl?: string | null;
 }
 
-export function InteractiveArticleModal({ htmlContent }: InteractiveArticleModalProps) {
+export function InteractiveArticleModal({ htmlContent, iframeUrl }: InteractiveArticleModalProps) {
     const [isOpen, setIsOpen] = useState(false);
+
+    if (!htmlContent && !iframeUrl) return null;
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -41,11 +44,19 @@ export function InteractiveArticleModal({ htmlContent }: InteractiveArticleModal
                         Explore the concepts from this article in an interactive environment.
                     </DialogDescription>
                 </div>
-                <div className="flex-1 overflow-y-auto p-6">
-                    <div
-                        className="interactive-embed space-y-4"
-                        dangerouslySetInnerHTML={{ __html: htmlContent }}
-                    />
+                <div className="flex-1 overflow-y-auto p-6 w-full h-full">
+                    {htmlContent ? (
+                        <div
+                            className="interactive-embed space-y-4 w-full h-full"
+                            dangerouslySetInnerHTML={{ __html: htmlContent }}
+                        />
+                    ) : iframeUrl ? (
+                        <iframe
+                            src={iframeUrl}
+                            className="w-full h-full rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950"
+                            title="Interactive Experience"
+                        />
+                    ) : null}
                 </div>
             </DialogContent>
         </Dialog>
