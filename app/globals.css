@@ -84,67 +84,71 @@
 }
 
 
-  @layer base {
-    body {
-      @apply bg-neutral-50 text-neutral-800 antialiased dark:bg-neutral-950 dark:text-neutral-100;
-      position: relative;
-    }
-
-
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      @apply font-serif tracking-tight text-neutral-900 dark:text-neutral-50;
-    }
-
-    h1 {
-      @apply text-4xl md:text-5xl lg:text-6xl font-medium;
-    }
-
-    h2 {
-      @apply text-3xl md:text-4xl font-medium;
-    }
-
-    h3 {
-      @apply text-2xl font-medium;
-    }
+@layer base {
+  body {
+    @apply bg-neutral-50 text-neutral-800 antialiased dark:bg-neutral-950 dark:text-neutral-100;
+    position: relative;
   }
 
-  @layer components {
-    .glass-panel {
-      @apply backdrop-blur-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] shadow-[var(--glass-shadow)];
-    }
 
-    .dark .glass-panel {
-      @apply border-[var(--glass-border-dark)] bg-[var(--glass-bg-dark)] shadow-[var(--glass-shadow-dark)];
-    }
 
-    .glass-card {
-      @apply glass-panel rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
-    }
-
-    .site-container {
-      @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-12 md:pt-16;
-    }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif tracking-tight text-neutral-900 dark:text-neutral-50;
   }
 
-  /* Typography Enhancements for Blog */
-  .blog-article {
-    @apply prose prose-neutral dark:prose-invert max-w-none;
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl font-medium;
   }
 
-  .blog-article>p:first-of-type {
-    @apply text-xl leading-relaxed text-neutral-600 dark:text-neutral-300;
+  h2 {
+    @apply text-3xl md:text-4xl font-medium;
   }
 
-  .blog-article>p:first-of-type::first-letter {
-    @apply float-left mr-3 text-5xl font-serif font-bold text-primary-600 dark:text-primary-400 leading-[0.8];
+  h3 {
+    @apply text-2xl font-medium;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply backdrop-blur-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] shadow-[var(--glass-shadow)];
   }
 
-  .blog-article a {
-    @apply text-primary-600 no-underline border-b border-primary-300/50 transition-colors hover:text-primary-700 hover:border-primary-500 dark:text-primary-400 dark:border-primary-700/50 dark:hover:text-primary-300;
+  .dark .glass-panel {
+    @apply border-[var(--glass-border-dark)] bg-[var(--glass-bg-dark)] shadow-[var(--glass-shadow-dark)];
   }
+
+  .glass-card {
+    @apply glass-panel rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  .site-container {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-12 md:pt-16;
+  }
+}
+
+/* Typography Enhancements for Blog */
+.blog-article {
+  @apply prose prose-neutral dark:prose-invert max-w-none;
+  @apply prose-headings:font-serif prose-headings:font-medium;
+  @apply prose-p:text-neutral-600 dark:prose-p:text-neutral-300 prose-p:leading-relaxed;
+  @apply prose-strong:font-semibold prose-strong:text-neutral-900 dark:prose-strong:text-white;
+  @apply prose-li:text-neutral-600 dark:prose-li:text-neutral-300;
+}
+
+.blog-article>p:first-of-type {
+  @apply text-xl leading-relaxed text-neutral-700 dark:text-neutral-200 font-serif;
+}
+
+.blog-article>p:first-of-type::first-letter {
+  @apply float-left mr-3 text-6xl font-serif font-bold text-primary-600 dark:text-primary-400 leading-[0.8] mt-2;
+}
+
+.blog-article a {
+  @apply text-primary-600 no-underline border-b border-primary-300/50 transition-all hover:text-primary-700 hover:border-primary-500 dark:text-primary-400 dark:border-primary-700/50 dark:hover:text-primary-300 hover:bg-primary-50/50 dark:hover:bg-primary-900/20 rounded-sm px-0.5;
+}

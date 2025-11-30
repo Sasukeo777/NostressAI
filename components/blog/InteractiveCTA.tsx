@@ -8,21 +8,41 @@ interface InteractiveCTAProps {
 
 export function InteractiveCTA({ slug }: InteractiveCTAProps) {
   return (
-    <div className="mt-12 mb-8 not-prose">
+    <div className="mt-16 mb-12 not-prose">
       <Link
         href={`/interactive/${slug}`}
-        className="group block relative overflow-hidden rounded-xl border border-primary-500/30 bg-gradient-to-br from-primary-600/15 via-teal-500/10 to-sky-500/10 dark:from-primary-500/25 dark:via-teal-500/15 p-6 md:p-7 backdrop-blur-sm hover:border-primary-500 transition-colors"
+        className="group block relative overflow-hidden rounded-[2.5rem] border border-primary-200/60 dark:border-primary-700/40 bg-gradient-to-br from-primary-50/80 via-white/50 to-primary-50/80 dark:from-primary-900/20 dark:via-neutral-900/50 dark:to-primary-900/20 p-8 md:p-10 transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_20px_40px_-15px_rgba(var(--primary-500),0.15)]"
       >
-        <div className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-[opacity] bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.7),transparent_60%)] dark:bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.25),transparent_60%)]" />
-        <div className="relative flex flex-col sm:flex-row sm:items-center gap-5">
-          <div className="h-14 w-14 rounded-lg bg-primary-600/80 dark:bg-primary-500/70 text-white flex items-center justify-center text-xl font-semibold shadow-md ring-4 ring-primary-500/30 group-hover:scale-105 transition-transform">✦</div>
-          <div className="flex-1">
-            <p className="text-sm font-semibold uppercase tracking-wide text-primary-600 dark:text-primary-400 mb-1">Interactive version</p>
-            <h3 className="text-lg font-semibold mb-1 leading-snug">Explore this topic in an immersive format</h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-300">Jump into charts, thematic tabs, and extended data designed to deepen the article.</p>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(var(--primary-500),0.1),transparent_50%)] opacity-60 transition-opacity group-hover:opacity-80" />
+        <div className="absolute right-0 bottom-0 w-64 h-64 bg-accent-500/5 blur-[80px] rounded-full pointer-events-none" />
+
+        <div className="relative flex flex-col sm:flex-row sm:items-center gap-6">
+          <div className="h-16 w-16 shrink-0 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-primary-500/20 group-hover:rotate-6 transition-transform duration-500">
+            <span className="relative z-10">✦</span>
+            <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
-          <div className="text-sm font-medium text-primary-600 dark:text-primary-400 whitespace-nowrap flex items-center gap-1">
-            Open <span aria-hidden>→</span>
+
+          <div className="flex-1 space-y-2">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex items-center rounded-full bg-primary-100 dark:bg-primary-900/50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-primary-700 dark:text-primary-300">
+                Interactive Version
+              </span>
+            </div>
+            <h3 className="text-xl md:text-2xl font-serif font-medium text-neutral-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">
+              Explore this topic in an immersive format
+            </h3>
+            <p className="text-neutral-600 dark:text-neutral-400 max-w-xl leading-relaxed">
+              Jump into charts, thematic tabs, and extended data designed to deepen the article.
+            </p>
+          </div>
+
+          <div className="shrink-0 self-start sm:self-center">
+            <span className="inline-flex items-center justify-center h-12 w-12 rounded-full border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 group-hover:bg-primary-600 group-hover:text-white group-hover:border-primary-600 transition-all duration-300">
+              <span className="sr-only">Open</span>
+              <svg className="w-5 h-5 transform group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </span>
           </div>
         </div>
       </Link>

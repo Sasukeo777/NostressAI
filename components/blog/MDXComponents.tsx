@@ -15,12 +15,24 @@ const Heading = (Tag: any) => function H(props: any) {
   );
 };
 
+import { Quote } from 'lucide-react';
+
 function Blockquote(props: any) {
-  return <blockquote className="border-l-4 border-primary-400/60 pl-4 italic text-neutral-700 dark:text-neutral-300" {...props} />;
+  return (
+    <div className="relative my-8 rounded-2xl bg-primary-50/50 dark:bg-primary-900/10 p-6 sm:p-8">
+      <Quote className="absolute top-6 left-6 h-8 w-8 text-primary-200 dark:text-primary-800/50 -z-10" />
+      <blockquote className="relative z-10 text-lg font-medium italic leading-relaxed text-primary-900 dark:text-primary-100" {...props} />
+    </div>
+  );
 }
 
 function Code(props: any) {
-  return <code className="rounded bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[13px]" {...props} />;
+  return (
+    <code
+      className="rounded-md bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[0.9em] font-mono text-primary-700 dark:text-primary-300 border border-neutral-200 dark:border-neutral-700"
+      {...props}
+    />
+  );
 }
 
 // Pre wrapper now delegated to client component PreCode to keep this module server-compatible
