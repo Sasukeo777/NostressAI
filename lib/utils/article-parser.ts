@@ -58,7 +58,9 @@ export function parseArticleContent(text: string): ParsedArticle {
 
     // 2. Parse Metadata Fields
     // Helper to extract value by key
-    const extractValue = (key: string, type: 'string' | 'array' = 'string') => {
+    function extractValue(key: string, type: 'string'): string | undefined;
+    function extractValue(key: string, type: 'array'): string[] | undefined;
+    function extractValue(key: string, type: 'string' | 'array' = 'string'): string | string[] | undefined {
         // Regex explanation:
         // key:\s* -> match key and spaces
         // (?:'([^']*)'|"([^"]*)"|\[(.*?)\]|([^ \n]+)) -> match single quoted, double quoted, bracketed array, or simple word
@@ -105,11 +107,11 @@ export function parseArticleContent(text: string): ParsedArticle {
         return undefined;
     };
 
-    result.title = extractValue('title');
-    result.date = extractValue('date');
-    result.excerpt = extractValue('excerpt');
-    result.category = extractValue('category');
-    result.interactive = extractValue('interactive');
+    result.title = extractValue('title', 'string');
+    result.date = extractValue('date', 'string');
+    result.excerpt = extractValue('excerpt', 'string');
+    result.category = extractValue('category', 'string');
+    result.interactive = extractValue('interactive', 'string');
 
     result.tags = extractValue('tags', 'array') as string[] | undefined;
     result.pillars = extractValue('pillars', 'array') as string[] | undefined;
