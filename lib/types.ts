@@ -7,7 +7,8 @@ export type HolisticPillar =
   | 'analog-tools'
   | 'neuroplasticity'
   | 'societal-impact'
-  | 'purpose';
+  | 'purpose'
+  | 'systems-thinking';
 
 export type AccentChoice = 'classic' | 'vivid';
 

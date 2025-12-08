@@ -6,3 +6,7 @@ yarn.lock
 pnpm-lock.yaml
 .env.local
 .env
+
+
+# Local Content Backups
+_content_backup/
