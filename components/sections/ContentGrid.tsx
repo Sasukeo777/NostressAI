@@ -7,6 +7,7 @@ import { MotionWrapper } from '@/components/ui/MotionWrapper';
 import { cn } from '@/lib/utils/cn';
 import type { HolisticPillar } from '@/lib/types';
 import { ReactNode } from 'react';
+import { ArrowRight } from 'lucide-react';
 
 export interface ShowcaseItem {
     title: string;
@@ -30,23 +31,35 @@ interface ContentGridProps {
 export function ContentGrid({ title, eyebrow, items, actionLink }: ContentGridProps) {
     return (
         <section>
-            <SectionHeading
-                title={title}
-                eyebrow={eyebrow}
-                action={
-                    <Link href={actionLink.href} className="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline dark:text-primary-400">
-                        {actionLink.label}
-                    </Link>
-                }
-            />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(250px,auto)]">
+            {/* Modern section header */}
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
+                <div>
+                    <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary-600 dark:text-primary-400 mb-3">
+                        <span className="w-8 h-px bg-primary-500" />
+                        {eyebrow}
+                    </span>
+                    <h2 className="text-3xl md:text-4xl font-serif font-medium text-neutral-900 dark:text-white">
+                        {title}
+                    </h2>
+                </div>
+                <Link
+                    href={actionLink.href}
+                    className="group inline-flex items-center gap-2 text-sm font-medium text-neutral-600 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400 transition-colors"
+                >
+                    {actionLink.label}
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+            </div>
+
+            {/* Bento-style grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {items.map((item, i) => (
                     <MotionWrapper
                         key={item.title}
                         delay={i * 0.1}
                         className={cn(
                             "h-full",
-                            i === 0 ? "md:col-span-2 md:row-span-1" : "md:col-span-1"
+                            i === 0 && "md:col-span-2 lg:col-span-2"
                         )}
                     >
                         <Card
@@ -56,9 +69,7 @@ export function ContentGrid({ title, eyebrow, items, actionLink }: ContentGridPr
                             badge={item.badge}
                             pillars={item.pillars}
                             footer={item.footer}
-                            className={cn(
-                                i === 0 && "bg-[image:var(--nature-glow)] dark:bg-[image:var(--nature-glow-dark)]"
-                            )}
+                            variant={i === 0 ? 'featured' : 'default'}
                         />
                     </MotionWrapper>
                 ))}

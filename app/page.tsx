@@ -109,17 +109,9 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <div className="pb-20">
-      <div className="px-4 md:px-6 mb-32 pt-12 md:pt-16">
-        <Hero />
-      </div>
+      <Hero />
 
-      <div className="site-container space-y-32">
-
-        <MotionWrapper variant="scale">
-          <NewsletterShowcase />
-        </MotionWrapper>
-
-        <Timeline data={timelineData} />
+      <div className="site-container space-y-32 mt-20">
 
         <ContentGrid
           title="Latest content"
@@ -127,6 +119,8 @@ export default function HomePage() {
           items={placeholderArticles}
           actionLink={{ href: '/blog', label: 'View all →' }}
         />
+
+        <Timeline data={timelineData} />
 
         <ContentGrid
           title="Courses"
@@ -141,6 +135,10 @@ export default function HomePage() {
           items={placeholderVideos}
           actionLink={{ href: '/videos', label: 'More →' }}
         />
+
+        <MotionWrapper variant="scale">
+          <NewsletterShowcase />
+        </MotionWrapper>
       </div>
     </div>
   );
