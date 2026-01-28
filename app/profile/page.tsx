@@ -15,7 +15,7 @@ export default async function ProfilePage() {
     redirect('/login');
   }
 
-  const supabase = createSupabaseServerComponentClient();
+  const supabase = await createSupabaseServerComponentClient();
   const { data: profile } = await supabase
     .from('profiles')
     .select('display_name, avatar_url, favorite_pillars, plan, light_accent, dark_accent')

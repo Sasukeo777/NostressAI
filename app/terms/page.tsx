@@ -149,7 +149,7 @@ export default function TermsOfServicePage() {
           services.
         </p>
         <p className="text-xs uppercase tracking-[0.3em] text-neutral-400 dark:text-neutral-500">
-          Last updated: {new Date().toISOString().slice(0, 10)}
+          Last updated: 2024-12-11
         </p>
       </header>
 

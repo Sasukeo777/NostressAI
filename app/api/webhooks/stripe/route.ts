@@ -12,7 +12,8 @@ export async function POST(req: Request) {
     }
 
     const body = await req.text();
-    const signature = headers().get('stripe-signature');
+    const headersList = await headers();
+    const signature = headersList.get('stripe-signature');
 
     if (!signature) {
         return NextResponse.json({ error: 'Missing stripe-signature header.' }, { status: 400 });

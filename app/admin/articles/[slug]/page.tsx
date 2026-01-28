@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 interface AdminArticleEditPageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export default async function AdminArticleEditPage({ params }: AdminArticleEditPageProps) {
@@ -18,7 +18,8 @@ export default async function AdminArticleEditPage({ params }: AdminArticleEditP
     redirect('/');
   }
 
-  const article = await getArticleForEdit(params.slug);
+  const { slug } = await params;
+  const article = await getArticleForEdit(slug);
   if (!article) {
     notFound();
   }

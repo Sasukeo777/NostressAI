@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
+// export const runtime = 'edge'; // Incompatible with cacheComponents
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);

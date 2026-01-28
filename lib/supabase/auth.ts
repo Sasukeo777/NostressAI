@@ -16,7 +16,7 @@ export const secureCookies = process.env.NODE_ENV === 'production';
 export const resolvedSupabaseUrl = supabaseUrl as string;
 export const resolvedSupabaseAnonKey = supabaseAnonKey as string;
 
-export function createSupabaseClientWithCookies(cookieStore: ReturnType<typeof cookies>) {
+export function createSupabaseClientWithCookies(cookieStore: Awaited<ReturnType<typeof cookies>>) {
   return createServerClient(resolvedSupabaseUrl, resolvedSupabaseAnonKey, {
     cookies: {
       get(name) {
@@ -39,13 +39,13 @@ export function createSupabaseClientWithCookies(cookieStore: ReturnType<typeof c
   });
 }
 
-export function createSupabaseServerActionClient() {
-  const cookieStore = cookies();
+export async function createSupabaseServerActionClient() {
+  const cookieStore = await cookies();
   return createSupabaseClientWithCookies(cookieStore);
 }
 
-export function createSupabaseServerComponentClient() {
-  const cookieStore = cookies();
+export async function createSupabaseServerComponentClient() {
+  const cookieStore = await cookies();
   return createServerClient(resolvedSupabaseUrl, resolvedSupabaseAnonKey, {
     cookies: {
       get(name) {

@@ -3,15 +3,41 @@ import Link from 'next/link';
 import { PillarBadge } from '@/components/ui/PillarBadge';
 import { getFormationBySlug } from '@/lib/server/formations';
 import { Button, buttonVariants } from '@/components/ui/Button';
+import { JsonLd } from '@/components/seo/JsonLd';
+import type { Course, WithContext } from 'schema-dts';
 
-export const dynamic = 'force-dynamic';
+// export const revalidate = 3600; // Incompatible with cacheComponents
+// export const dynamic = 'force-dynamic';
 
-export default async function CoursePage({ params }: { params: { slug: string } }) {
-  const formation = await getFormationBySlug(params.slug);
+export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const formation = await getFormationBySlug(slug);
   if (!formation) return notFound();
+
+  const courseSchema: WithContext<Course> = {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: formation.title,
+    description: formation.short,
+    provider: {
+      '@type': 'Organization',
+      name: 'NoStress AI',
+      sameAs: 'https://www.nostress.ai'
+    },
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: 'Online',
+      instructor: {
+        '@type': 'Person',
+        name: 'NoStress AI Team',
+        image: 'https://www.nostress.ai/favicon.svg'
+      }
+    }
+  };
 
   return (
     <div className="site-container py-12 md:py-20 space-y-8">
+      <JsonLd schema={courseSchema} />
       <div>
         <Link href="/courses" className="text-xs text-primary-600 hover:underline">← Back to courses</Link>
         <h1 className="mt-2 text-3xl md:text-4xl font-serif font-medium tracking-tight text-neutral-900 dark:text-white">{formation.title}</h1>

@@ -5,6 +5,10 @@ import { listContactMessages } from '@/lib/server/contactMessages';
 import { DeleteMessageButton } from './DeleteMessageButton';
 import { EraseMessagesByEmail } from './EraseMessagesByEmail';
 
+export const dynamic = 'force-dynamic';
+
+
+
 export const metadata: Metadata = {
   title: 'Contact messages | Admin',
   description: 'Review inbound contact form submissions and fulfil GDPR deletion requests.'

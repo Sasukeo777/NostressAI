@@ -6,6 +6,7 @@ import { CheckoutButton } from '@/components/ui/CheckoutButton';
 import { MotionWrapper } from '@/components/ui/MotionWrapper';
 import { Timeline } from '@/components/ui/Timeline';
 import { PillarBadge } from '@/components/ui/PillarBadge';
+import { NewsletterShowcase } from '@/components/sections/NewsletterShowcase';
 
 const placeholderArticles: ShowcaseItem[] = [
   { title: 'Understanding parental stress in the AI era', description: 'Neuroscience basics + how AI can support instead of overload.', href: '/blog', badge: 'Article', pillars: ['work', 'ai-tools'], footer: <span>~4 min read</span> },
@@ -114,6 +115,9 @@ export default function HomePage() {
 
       <div className="site-container space-y-32">
 
+        <MotionWrapper variant="scale">
+          <NewsletterShowcase />
+        </MotionWrapper>
 
         <Timeline data={timelineData} />
 
@@ -137,55 +141,6 @@ export default function HomePage() {
           items={placeholderVideos}
           actionLink={{ href: '/videos', label: 'More →' }}
         />
-
-        <MotionWrapper variant="scale">
-          <section className="relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-neutral-900 p-12 text-neutral-900 dark:text-white shadow-2xl shadow-neutral-200/50 dark:shadow-neutral-900/20 md:p-20 border border-neutral-100 dark:border-neutral-800">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-neutral-50 via-white to-neutral-100 dark:from-neutral-800 dark:via-neutral-900 dark:to-neutral-950" />
-            <div className="absolute top-0 right-0 h-[500px] w-[500px] -translate-y-1/2 translate-x-1/3 rounded-full bg-primary-900/20 blur-[100px]" />
-
-            <div className="relative z-10 grid gap-12 lg:grid-cols-2 lg:items-center">
-              <div className="space-y-8">
-                <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 dark:border-white/10 bg-white/50 dark:bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary-600 dark:text-primary-200 backdrop-blur-sm">
-                  Monthly Newsletter · $0.99
-                </div>
-                <h2 className="font-serif text-4xl font-medium leading-tight md:text-5xl">
-                  One email per month. <br />
-                  <span className="text-primary-600 dark:text-primary-300">Zero noise.</span>
-                </h2>
-                <p className="max-w-md text-lg text-neutral-600 dark:text-neutral-400">
-                  Highly structured, low-volume digest featuring <strong>The 5 AI News You Need to Know</strong> + a <strong>Monthly Nostress Article</strong>. Subscribe separately for $0.99 whenever you want the distilled briefing.
-                </p>
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                  <CheckoutButton plan="newsletter" size="lg" className="bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200">
-                    Join the newsletter ($0.99)
-                  </CheckoutButton>
-                  <Link href="/pro" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white hover:underline">
-                    Compare plans →
-                  </Link>
-                </div>
-                <p className="text-[11px] uppercase tracking-widest text-neutral-500">Launch pricing · Cancel anytime</p>
-              </div>
-
-              <div className="relative hidden lg:block">
-                {/* Abstract visual for the newsletter */}
-                <div className="aspect-square w-full max-w-md rounded-2xl border border-neutral-200 dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-sm p-8">
-                  <div className="h-full w-full rounded-xl border border-neutral-200 dark:border-white/5 bg-white/50 dark:bg-neutral-900/50 p-6">
-                    <div className="h-4 w-24 rounded bg-neutral-200 dark:bg-white/10 mb-8" />
-                    <div className="space-y-3">
-                      <div className="h-2 w-full rounded bg-neutral-200 dark:bg-white/5" />
-                      <div className="h-2 w-5/6 rounded bg-neutral-200 dark:bg-white/5" />
-                      <div className="h-2 w-4/6 rounded bg-neutral-200 dark:bg-white/5" />
-                    </div>
-                    <div className="mt-8 space-y-3">
-                      <div className="h-2 w-full rounded bg-neutral-200 dark:bg-white/5" />
-                      <div className="h-2 w-11/12 rounded bg-neutral-200 dark:bg-white/5" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        </MotionWrapper>
       </div>
     </div>
   );

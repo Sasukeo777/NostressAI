@@ -6,6 +6,8 @@ import { listResourcesForAdmin } from '@/lib/server/resources';
 import { setResourceListingVisibility } from './actions';
 import { ResourceManagerTable } from './ResourceManagerTable';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Resources • Admin'
 };

@@ -3,9 +3,10 @@
 import fs from 'fs/promises';
 import path from 'path';
 import matter from 'gray-matter';
+import { createClient } from '@supabase/supabase-js';
+import { unstable_noStore as noStore } from 'next/cache';
 
 import type { BlogMeta, HolisticPillar } from '@/lib/types';
-import { getSupabaseServiceClient } from '@/lib/supabaseClient';
 
 const BLOG_CONTENT_DIR = path.join(process.cwd(), 'content', 'blog');
 
@@ -21,6 +22,7 @@ interface ArticleRow {
   interactive_slug: string | null;
   interactive_html: string | null;
   is_listed?: boolean | null;
+  hero_image?: string | null;
 }
 
 function normaliseDate(value: unknown): string {
@@ -52,57 +54,71 @@ function mapArticleRow(row: ArticleRow, pillars?: HolisticPillar[]): BlogMeta {
     excerpt: row.excerpt ?? undefined,
     category: row.category ?? undefined,
     tags: row.tags ?? undefined,
-    pillars
+    pillars,
+    heroImage: row.hero_image ?? undefined
   };
 }
 
 async function fetchPostsFromSupabase(): Promise<BlogMeta[]> {
-  const supabase = getSupabaseServiceClient();
-
-  const [articlesResult, pivotResult, pillarResult] = await Promise.all([
-    supabase
-      .from('articles')
-      .select('id, slug, title, excerpt, category, tags, published_at, status, interactive_slug, interactive_html, is_listed')
-      .order('published_at', { ascending: false }),
-    supabase.from('article_pillars').select('article_id, pillar_id'),
-    supabase.from('pillars').select('id, slug')
-  ]);
-
-  if (articlesResult.error) {
-    throw new Error(`Failed to load articles: ${articlesResult.error.message}`);
+  // Skip DB fetch during build to prevent crashes
+  if (process.env.npm_lifecycle_event === 'build') {
+    return [];
   }
-  if (pivotResult.error) {
-    throw new Error(`Failed to load article pillars: ${pivotResult.error.message}`);
-  }
-  if (pillarResult.error) {
-    throw new Error(`Failed to load pillars: ${pillarResult.error.message}`);
-  }
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  const articles = (articlesResult.data ?? []).filter(
-    (article) => article.status === 'published' && article.is_listed !== false
-  );
-  if (!articles.length) {
+  if (!supabaseUrl || !serviceKey || serviceKey === 'undefined' || supabaseUrl === 'undefined') {
     return [];
   }
 
-  const pivotRows = pivotResult.data ?? [];
-  const pillarRows = pillarResult.data ?? [];
+  try {
+    const supabase = createClient(supabaseUrl, serviceKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      }
+    });
 
-  const pillarMap = new Map<string, HolisticPillar>();
-  pillarRows.forEach((row) => {
-    pillarMap.set(row.id, row.slug as HolisticPillar);
-  });
+    const [articlesResult, pivotResult, pillarResult] = await Promise.all([
+      supabase
+        .from('articles')
+        .select('id, slug, title, excerpt, category, tags, published_at, status, interactive_slug, interactive_html, is_listed, hero_image')
+        .order('published_at', { ascending: false }),
+      supabase.from('article_pillars').select('article_id, pillar_id'),
+      supabase.from('pillars').select('id, slug')
+    ]);
 
-  const articlePillars = new Map<string, HolisticPillar[]>();
-  pivotRows.forEach((pivot) => {
-    const pillarSlug = pillarMap.get(pivot.pillar_id);
-    if (!pillarSlug) return;
-    const list = articlePillars.get(pivot.article_id) ?? [];
-    list.push(pillarSlug);
-    articlePillars.set(pivot.article_id, list);
-  });
+    if (articlesResult.error) throw new Error(articlesResult.error.message);
+    if (pivotResult.error) throw new Error(pivotResult.error.message);
+    if (pillarResult.error) throw new Error(pillarResult.error.message);
 
-  return articles.map((row) => mapArticleRow(row, articlePillars.get(row.id)));
+    const articles = (articlesResult.data ?? []).filter(
+      (article) => article.status === 'published' && article.is_listed !== false
+    );
+    if (!articles.length) return [];
+
+    const pivotRows = pivotResult.data ?? [];
+    const pillarRows = pillarResult.data ?? [];
+
+    const pillarMap = new Map<string, HolisticPillar>();
+    pillarRows.forEach((row) => {
+      pillarMap.set(row.id, row.slug as HolisticPillar);
+    });
+
+    const articlePillars = new Map<string, HolisticPillar[]>();
+    pivotRows.forEach((pivot) => {
+      const pillarSlug = pillarMap.get(pivot.pillar_id);
+      if (!pillarSlug) return;
+      const list = articlePillars.get(pivot.article_id) ?? [];
+      list.push(pillarSlug);
+      articlePillars.set(pivot.article_id, list);
+    });
+
+    return articles.map((row) => mapArticleRow(row, articlePillars.get(row.id)));
+  } catch (error) {
+    console.error('[blog] Supabase fetch failed (handled):', error);
+    return [];
+  }
 }
 
 async function fetchPostsFromFilesystem(): Promise<BlogMeta[]> {
@@ -110,7 +126,6 @@ async function fetchPostsFromFilesystem(): Promise<BlogMeta[]> {
   try {
     entries = await fs.readdir(BLOG_CONTENT_DIR);
   } catch (error) {
-    console.error('[blog] Unable to read blog directory:', error);
     return [];
   }
 
@@ -138,7 +153,8 @@ async function fetchPostsFromFilesystem(): Promise<BlogMeta[]> {
         excerpt: createExcerpt(content, data.excerpt),
         category: typeof data.category === 'string' ? data.category : undefined,
         tags,
-        pillars
+        pillars,
+        heroImage: typeof data.heroImage === 'string' ? data.heroImage : undefined
       };
 
       return post;
@@ -149,13 +165,11 @@ async function fetchPostsFromFilesystem(): Promise<BlogMeta[]> {
 }
 
 export async function getAllPosts(): Promise<BlogMeta[]> {
-  try {
-    const posts = await fetchPostsFromSupabase();
-    if (posts.length > 0) {
-      return posts;
-    }
-  } catch (error) {
-    console.error('[blog] Falling back to filesystem posts:', error);
+  noStore();
+  // Try DB first, fall back to filesystem
+  const posts = await fetchPostsFromSupabase();
+  if (posts.length > 0) {
+    return posts;
   }
 
   return fetchPostsFromFilesystem();

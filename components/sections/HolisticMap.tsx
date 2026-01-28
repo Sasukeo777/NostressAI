@@ -2,26 +2,8 @@
 
 import Link from 'next/link';
 import type { HolisticPillar } from '@/lib/types';
-import { HOLISTIC_PILLARS } from '@/lib/pillars';
+import { HOLISTIC_PILLARS, PILLAR_META_CATEGORIES } from '@/lib/pillars';
 import { cn } from '@/lib/utils/cn';
-
-const PILLAR_SECTIONS: { title: string; description: string; pillars: HolisticPillar[] }[] = [
-  {
-    title: 'Regulate the body',
-    description: 'Energy, sleep, and somatic resets that stabilise the nervous system.',
-    pillars: ['nutrition', 'sleep', 'mind-body']
-  },
-  {
-    title: 'Refine the systems',
-    description: 'Design workflows, AI guardrails, and tactile buffers that remove friction.',
-    pillars: ['work', 'ai-tools', 'analog-tools']
-  },
-  {
-    title: 'Expand the horizon',
-    description: 'Learning, context, and purpose so small routines ladder up to meaning.',
-    pillars: ['neuroplasticity', 'societal-impact', 'purpose']
-  }
-];
 
 const PILLAR_INDEX = HOLISTIC_PILLARS.reduce<Record<HolisticPillar, (typeof HOLISTIC_PILLARS)[number]>>((acc, pillar) => {
   acc[pillar.id] = pillar;
@@ -52,7 +34,7 @@ export function HolisticMap() {
 
         <div className="mt-10 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="space-y-3">
-            {PILLAR_SECTIONS.map((section) => (
+            {PILLAR_META_CATEGORIES.map((section) => (
               <div key={section.title} className="accent-panel rounded-2xl p-4 text-left">
                 <p className="text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-primary-600 dark:text-primary-200">{section.title}</p>
                 <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{section.description}</p>
@@ -63,7 +45,7 @@ export function HolisticMap() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {HOLISTIC_PILLARS.map((pillar) => {
               const Icon = pillar.icon;
-              const section = PILLAR_SECTIONS.find((s) => s.pillars.includes(pillar.id));
+              const section = PILLAR_META_CATEGORIES.find((s) => s.pillars.includes(pillar.id));
               return (
                 <article
                   key={pillar.id}

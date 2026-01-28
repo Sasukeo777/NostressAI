@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: `Missing Stripe price for plan "${plan}".` }, { status: 500 });
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseAuth = createSupabaseClientWithCookies(cookieStore);
   const {
     data: { session }

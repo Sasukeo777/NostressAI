@@ -9,6 +9,7 @@ import { getHighlighter } from 'shiki';
 
 import type { HolisticPillar } from '@/lib/types';
 import { getSupabaseServiceClient } from '@/lib/supabaseClient';
+import { unstable_noStore as noStore } from 'next/cache';
 
 const BLOG_CONTENT_DIR = path.join(process.cwd(), 'content', 'blog');
 
@@ -92,6 +93,11 @@ async function compileMdx(source: string) {
 }
 
 async function getPostFromSupabase(slug: string): Promise<CompiledPost | null> {
+  // Skip DB fetch during build to prevent crashes
+  if (process.env.npm_lifecycle_event === 'build') {
+    return null;
+  }
+  noStore();
   const supabase = getSupabaseServiceClient();
   const { data: article, error } = await supabase
     .from('articles')

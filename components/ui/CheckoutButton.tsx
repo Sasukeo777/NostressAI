@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Button, type ButtonProps } from '@/components/ui/Button';
 
-type PlanType = 'newsletter' | 'plus';
+type PlanType = 'newsletter' | 'plus' | 'lifetime';
 
 interface CheckoutButtonProps extends Omit<ButtonProps, 'onClick'> {
   plan: PlanType;

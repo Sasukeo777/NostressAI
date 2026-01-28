@@ -5,6 +5,8 @@ import { CreateCourseForm } from './CreateCourseForm';
 import { CourseVisibilityManager } from './CourseVisibilityManager';
 import { setFormationListingVisibility } from './actions';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Create Course • Admin'
 };

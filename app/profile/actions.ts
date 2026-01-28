@@ -37,7 +37,7 @@ export async function updateProfile(_: ProfileActionState, formData: FormData): 
     return { error: 'Please select exactly 2 or 3 focus pillars.', favoritePillars, lightAccent, darkAccent };
   }
 
-  const supabase = createSupabaseServerActionClient();
+  const supabase = await createSupabaseServerActionClient();
   const {
     data: { user }
   } = await supabase.auth.getUser();

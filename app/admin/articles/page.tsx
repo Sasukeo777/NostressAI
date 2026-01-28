@@ -6,6 +6,8 @@ import { listArticlesForAdmin } from '@/lib/server/articles';
 import { setArticleListingVisibility } from './actions';
 import { ArticleManagerTable } from './ArticleManagerTable';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Articles • Admin'
 };

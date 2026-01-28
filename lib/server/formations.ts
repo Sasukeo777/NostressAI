@@ -3,6 +3,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getSupabaseServiceClient } from '@/lib/supabaseClient';
 import type { Formation, AdminFormationSummary } from '@/lib/types';
+import { unstable_noStore as noStore } from 'next/cache';
+import { createClient } from '@supabase/supabase-js';
 
 interface FormationRow {
   id: string;
@@ -18,42 +20,58 @@ interface FormationRow {
 }
 
 export async function listFormations(): Promise<Formation[]> {
-  const supabase = getSupabaseServiceClient();
-
-  const [formationRows, pivotResult, pillarResult] = await Promise.all([
-    fetchFormationRows(supabase),
-    supabase.from('formation_pillars').select('formation_id, pillar_id'),
-    supabase.from('pillars').select('id, slug')
-  ]);
-
-  if (pivotResult.error) {
-    throw new Error(`Failed to load formation pillars: ${pivotResult.error.message}`);
+  // Skip DB fetch during build to prevent crashes
+  if (process.env.npm_lifecycle_event === 'build') {
+    return [];
   }
-  if (pillarResult.error) {
-    throw new Error(`Failed to load pillars: ${pillarResult.error.message}`);
+  noStore();
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceKey) {
+    return [];
   }
 
-  const formationsData = formationRows ?? [];
-  const pivotRows = pivotResult.data ?? [];
-  const pillarRows = pillarResult.data ?? [];
+  try {
+    const supabase = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
 
-  const visibleFormations = formationsData.filter((row) => row.is_listed !== false);
+    const [formationRows, pivotResult, pillarResult] = await Promise.all([
+      fetchFormationRows(supabase),
+      supabase.from('formation_pillars').select('formation_id, pillar_id'),
+      supabase.from('pillars').select('id, slug')
+    ]);
 
-  const pillarMap = new Map<string, string>();
-  pillarRows.forEach((pillar) => {
-    pillarMap.set(pillar.id, pillar.slug);
-  });
+    if (pivotResult.error) throw new Error(pivotResult.error.message);
+    if (pillarResult.error) throw new Error(pillarResult.error.message);
 
-  const formationPillars = new Map<string, string[]>();
-  pivotRows.forEach((pivot) => {
-    const slug = pillarMap.get(pivot.pillar_id);
-    if (!slug) return;
-    const list = formationPillars.get(pivot.formation_id) ?? [];
-    list.push(slug);
-    formationPillars.set(pivot.formation_id, list);
-  });
+    const formationsData = formationRows ?? [];
+    const pivotRows = pivotResult.data ?? [];
+    const pillarRows = pillarResult.data ?? [];
 
-  return visibleFormations.map((row) => mapFormationRow(row, formationPillars.get(row.id)));
+    const visibleFormations = formationsData.filter((row) => row.is_listed !== false);
+
+    const pillarMap = new Map<string, string>();
+    pillarRows.forEach((pillar) => {
+      pillarMap.set(pillar.id, pillar.slug);
+    });
+
+    const formationPillars = new Map<string, string[]>();
+    pivotRows.forEach((pivot) => {
+      const slug = pillarMap.get(pivot.pillar_id);
+      if (!slug) return;
+      const list = formationPillars.get(pivot.formation_id) ?? [];
+      list.push(slug);
+      formationPillars.set(pivot.formation_id, list);
+    });
+
+    return visibleFormations.map((row) => mapFormationRow(row, formationPillars.get(row.id)));
+  } catch (error) {
+    console.error('[formations] Failed to list formations (handled):', error);
+    return [];
+  }
 }
 
 export async function listFormationsForAdmin(): Promise<AdminFormationSummary[]> {
@@ -77,32 +95,41 @@ export async function listFormationsForAdmin(): Promise<AdminFormationSummary[]>
 }
 
 export async function getFormationBySlug(slug: string): Promise<Formation | null> {
-  const supabase = getSupabaseServiceClient();
+  noStore();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  const formationRow = await fetchFormationRowBySlug(supabase, slug);
-  if (!formationRow || formationRow.is_listed === false) return null;
+  if (!supabaseUrl || !serviceKey) return null;
 
-  const [{ data: pivotRows, error: pivotError }, { data: pillarRows, error: pillarError }] = await Promise.all([
-    supabase
-      .from('formation_pillars')
-      .select('pillar_id')
-      .eq('formation_id', formationRow.id),
-    supabase
-      .from('pillars')
-      .select('id, slug')
-  ]);
+  try {
+    const supabase = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
 
-  if (pivotError) {
-    throw new Error(`Failed to load formation pillars: ${pivotError.message}`);
+    const formationRow = await fetchFormationRowBySlug(supabase, slug);
+    if (!formationRow || formationRow.is_listed === false) return null;
+
+    const [{ data: pivotRows, error: pivotError }, { data: pillarRows, error: pillarError }] = await Promise.all([
+      supabase
+        .from('formation_pillars')
+        .select('pillar_id')
+        .eq('formation_id', formationRow.id),
+      supabase
+        .from('pillars')
+        .select('id, slug')
+    ]);
+
+    if (pivotError) throw new Error(pivotError.message);
+    if (pillarError) throw new Error(pillarError.message);
+
+    const pillarSet = new Set((pivotRows ?? []).map((pivot) => pivot.pillar_id));
+    const pillarSlugs = pillarRows?.filter((row) => pillarSet.has(row.id)).map((row) => row.slug) ?? [];
+
+    return mapFormationRow(formationRow, pillarSlugs);
+  } catch (error) {
+    console.error('[formations] Failed to get formation by slug:', error);
+    return null;
   }
-  if (pillarError) {
-    throw new Error(`Failed to load pillars: ${pillarError.message}`);
-  }
-
-  const pillarSet = new Set((pivotRows ?? []).map((pivot) => pivot.pillar_id));
-  const pillarSlugs = pillarRows?.filter((row) => pillarSet.has(row.id)).map((row) => row.slug) ?? [];
-
-  return mapFormationRow(formationRow, pillarSlugs);
 }
 
 function mapFormationRow(row: FormationRow, pillarSlugs?: string[]): Formation {
@@ -138,9 +165,7 @@ async function fetchFormationRows(supabase: SupabaseClient): Promise<FormationRo
       .select('id, slug, title, summary, level, modules, status, external_url, is_listed')
       .order('title', { ascending: true });
 
-    if (fallback.error) {
-      throw new Error(`Failed to load formations: ${fallback.error.message}`);
-    }
+    if (fallback.error) throw new Error(fallback.error.message);
 
     return (fallback.data ?? []).map((row) => ({
       ...row,
@@ -149,10 +174,7 @@ async function fetchFormationRows(supabase: SupabaseClient): Promise<FormationRo
     }));
   }
 
-  if (error) {
-    throw new Error(`Failed to load formations: ${error.message}`);
-  }
-
+  if (error) throw new Error(error.message);
   return data;
 }
 
@@ -170,13 +192,8 @@ async function fetchFormationRowBySlug(supabase: SupabaseClient, slug: string): 
       .eq('slug', slug)
       .maybeSingle();
 
-    if (fallback.error) {
-      throw new Error(`Failed to load formation: ${fallback.error.message}`);
-    }
-
-    if (!fallback.data) {
-      return null;
-    }
+    if (fallback.error) throw new Error(fallback.error.message);
+    if (!fallback.data) return null;
 
     return {
       ...fallback.data,
@@ -185,10 +202,7 @@ async function fetchFormationRowBySlug(supabase: SupabaseClient, slug: string): 
     };
   }
 
-  if (error) {
-    throw new Error(`Failed to load formation: ${error.message}`);
-  }
-
+  if (error) throw new Error(error.message);
   return data;
 }
 

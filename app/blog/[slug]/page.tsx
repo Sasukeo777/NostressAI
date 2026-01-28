@@ -14,15 +14,16 @@ import * as runtime from 'react/jsx-runtime';
 import React from 'react';
 import { formatDateLabel } from '@/lib/utils/formatDate';
 
-export async function generateStaticParams() {
-  const posts = await getAllPosts();
-  return posts.map((p) => ({ slug: p.slug }));
-}
+// export async function generateStaticParams() {
+//   const posts = await getAllPosts();
+//   return posts.map((p) => ({ slug: p.slug }));
+// }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = await getPostMdx(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPostMdx(slug);
   if (!post) return {};
-  const title = post.meta.title || params.slug.replace(/-/g, ' ');
+  const title = post.meta.title || slug.replace(/-/g, ' ');
   const description = post.meta.excerpt || post.excerpt;
   const ogUrl = `/api/og?title=${encodeURIComponent(title)}`;
   return {
@@ -43,14 +44,15 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function BlogPost({ params }: { params: { slug: string } }) {
-  const compiled = await getPostMdx(params.slug);
+export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const compiled = await getPostMdx(slug);
   if (!compiled) return notFound();
 
   // Build the MDX component from the compiled code function body
   const { code, meta, excerpt, interactiveHtml } = compiled;
 
-  console.log(`[BlogPost Debug] Slug: ${params.slug}`);
+  console.log(`[BlogPost Debug] Slug: ${slug}`);
   console.log(`[BlogPost Debug] interactiveHtml present:`, !!interactiveHtml);
   console.log(`[BlogPost Debug] interactiveHtml length:`, interactiveHtml?.length);
   console.log(`[BlogPost Debug] meta.interactive:`, meta.interactive);
@@ -74,7 +76,7 @@ export default async function BlogPost({ params }: { params: { slug: string } })
         </li>
         <li className="opacity-50">/</li>
         <li aria-current="page" className="font-medium text-neutral-700 dark:text-neutral-300">
-          {meta.title || params.slug.replace(/-/g, ' ')}
+          {meta.title || slug.replace(/-/g, ' ')}
         </li>
       </ol>
     </nav>
@@ -105,7 +107,7 @@ export default async function BlogPost({ params }: { params: { slug: string } })
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-medium leading-[1.1] tracking-tight text-neutral-900 dark:text-white mb-6">
-              {meta.title || params.slug.replace(/-/g, ' ')}
+              {meta.title || slug.replace(/-/g, ' ')}
             </h1>
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-6 border-t border-neutral-200 dark:border-white/10 pt-6">
@@ -138,15 +140,57 @@ export default async function BlogPost({ params }: { params: { slug: string } })
               __html: JSON.stringify({
                 '@context': 'https://schema.org',
                 '@type': 'Article',
-                headline: meta.title || params.slug,
+                headline: meta.title || slug,
                 datePublished: meta.date || new Date().toISOString(),
                 dateModified: meta.date || new Date().toISOString(),
                 description: meta.excerpt || excerpt,
-                author: meta.author ? { '@type': 'Person', name: meta.author } : undefined,
+                author: {
+                  '@type': 'Person',
+                  name: meta.author || 'NoStress AI',
+                  url: 'https://www.nostress.ai/about'
+                },
+                publisher: {
+                  '@type': 'Organization',
+                  name: 'NoStress AI',
+                  logo: {
+                    '@type': 'ImageObject',
+                    url: 'https://www.nostress.ai/favicon.svg'
+                  }
+                },
                 mainEntityOfPage: {
                   '@type': 'WebPage',
-                  '@id': `https://www.nostress.ai/blog/${params.slug}`
+                  '@id': `https://www.nostress.ai/blog/${slug}`
                 }
+              })
+            }}
+          />
+          <script
+            type="application/ld+json"
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'BreadcrumbList',
+                itemListElement: [
+                  {
+                    '@type': 'ListItem',
+                    position: 1,
+                    name: 'Home',
+                    item: 'https://www.nostress.ai'
+                  },
+                  {
+                    '@type': 'ListItem',
+                    position: 2,
+                    name: 'Blog',
+                    item: 'https://www.nostress.ai/blog'
+                  },
+                  {
+                    '@type': 'ListItem',
+                    position: 3,
+                    name: meta.title || slug,
+                    item: `https://www.nostress.ai/blog/${slug}`
+                  }
+                ]
               })
             }}
           />

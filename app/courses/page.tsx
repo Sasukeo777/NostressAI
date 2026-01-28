@@ -2,15 +2,21 @@ import { listFormations } from '@/lib/server/formations';
 import { CourseList } from '@/components/courses/CourseList';
 import type { HolisticPillar } from '@/lib/types';
 import { PILLAR_IDS } from '@/lib/pillars';
+import { Suspense } from 'react';
 
-export const dynamic = 'force-dynamic';
+// export const revalidate = 3600; // Incompatible with cacheComponents
+// export const dynamic = 'force-dynamic';
 
-export default async function CoursesIndex({ searchParams }: { searchParams?: { pillar?: string } }) {
+async function CoursesContent({ searchParams }: { searchParams: Promise<{ pillar?: string }> }) {
   const formations = await listFormations();
-  const pillarParam = searchParams?.pillar;
+  const { pillar } = await searchParams;
   const initialPillar =
-    pillarParam && PILLAR_IDS.includes(pillarParam as HolisticPillar) ? (pillarParam as HolisticPillar) : undefined;
+    pillar && PILLAR_IDS.includes(pillar as HolisticPillar) ? (pillar as HolisticPillar) : undefined;
 
+  return <CourseList initialCourses={formations} initialPillar={initialPillar} />;
+}
+
+export default function CoursesIndex({ searchParams }: { searchParams: Promise<{ pillar?: string }> }) {
   return (
     <div className="relative min-h-screen">
       {/* Background Elements */}
@@ -36,7 +42,9 @@ export default async function CoursesIndex({ searchParams }: { searchParams?: { 
         </div>
 
         {/* Course List */}
-        <CourseList initialCourses={formations} initialPillar={initialPillar} />
+        <Suspense fallback={<div className="h-96 animate-pulse bg-neutral-100 dark:bg-white/5 rounded-3xl" />}>
+          <CoursesContent searchParams={searchParams} />
+        </Suspense>
       </div>
     </div>
   );

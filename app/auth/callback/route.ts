@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     try {
-      const supabase = createSupabaseClientWithCookies(cookies());
+      const supabase = createSupabaseClientWithCookies(await cookies());
       const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
       if (exchangeError) {
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
             };
             if (providerDisplayName) insertPayload.display_name = providerDisplayName;
             if (providerAvatar) insertPayload.avatar_url = providerAvatar;
-            
+
             const { error: insertError } = await supabase
               .from('profiles')
               .insert(insertPayload);
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
             if (!profile.avatar_url && providerAvatar) {
               updatePayload.avatar_url = providerAvatar;
             }
-            
+
             if (Object.keys(updatePayload).length > 0) {
               const { error: updateError } = await supabase
                 .from('profiles')

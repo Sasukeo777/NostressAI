@@ -1,7 +1,8 @@
 'use server';
 
-import { getSupabaseServiceClient } from '@/lib/supabaseClient';
 import type { ResourceMeta, HolisticPillar } from '@/lib/types';
+import { unstable_noStore as noStore } from 'next/cache';
+import { createClient } from '@supabase/supabase-js';
 
 interface ResourceRow {
   id: string;
@@ -16,48 +17,61 @@ interface ResourceRow {
 }
 
 export async function getAllResources(): Promise<ResourceMeta[]> {
-  const supabase = getSupabaseServiceClient();
-
-  const [resourceResult, pivotResult, pillarResult] = await Promise.all([
-    supabase
-      .from('resources')
-      .select('id, slug, type, title, excerpt, tags, published_at, status, is_listed')
-      .order('published_at', { ascending: false }),
-    supabase.from('resource_pillars').select('resource_id, pillar_id'),
-    supabase.from('pillars').select('id, slug')
-  ]);
-
-  if (resourceResult.error) {
-    throw new Error(`Failed to load resources: ${resourceResult.error.message}`);
+  // Skip DB fetch during build to prevent crashes
+  if (process.env.npm_lifecycle_event === 'build') {
+    return [];
   }
-  if (pivotResult.error) {
-    throw new Error(`Failed to load resource pillars: ${pivotResult.error.message}`);
-  }
-  if (pillarResult.error) {
-    throw new Error(`Failed to load pillars: ${pillarResult.error.message}`);
+  noStore();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceKey) {
+    return [];
   }
 
-  const rows = (resourceResult.data ?? []).filter(
-    (row) => row.status === 'published' && row.is_listed !== false
-  );
-  const pivotRows = pivotResult.data ?? [];
-  const pillarRows = pillarResult.data ?? [];
+  try {
+    const supabase = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
 
-  const pillarMap = new Map<string, string>();
-  pillarRows.forEach((row) => {
-    pillarMap.set(row.id, row.slug);
-  });
+    const [resourceResult, pivotResult, pillarResult] = await Promise.all([
+      supabase
+        .from('resources')
+        .select('id, slug, type, title, excerpt, tags, published_at, status, is_listed')
+        .order('published_at', { ascending: false }),
+      supabase.from('resource_pillars').select('resource_id, pillar_id'),
+      supabase.from('pillars').select('id, slug')
+    ]);
 
-  const resourcePillars = new Map<string, HolisticPillar[]>();
-  pivotRows.forEach((pivot) => {
-    const slug = pillarMap.get(pivot.pillar_id);
-    if (!slug) return;
-    const list = resourcePillars.get(pivot.resource_id) ?? [];
-    list.push(slug as HolisticPillar);
-    resourcePillars.set(pivot.resource_id, list);
-  });
+    if (resourceResult.error) throw new Error(resourceResult.error.message);
+    if (pivotResult.error) throw new Error(pivotResult.error.message);
+    if (pillarResult.error) throw new Error(pillarResult.error.message);
 
-  return rows.map((row) => mapResourceRow(row, resourcePillars.get(row.id)));
+    const rows = (resourceResult.data ?? []).filter(
+      (row) => row.status === 'published' && row.is_listed !== false
+    );
+    const pivotRows = pivotResult.data ?? [];
+    const pillarRows = pillarResult.data ?? [];
+
+    const pillarMap = new Map<string, string>();
+    pillarRows.forEach((row) => {
+      pillarMap.set(row.id, row.slug);
+    });
+
+    const resourcePillars = new Map<string, HolisticPillar[]>();
+    pivotRows.forEach((pivot) => {
+      const slug = pillarMap.get(pivot.pillar_id);
+      if (!slug) return;
+      const list = resourcePillars.get(pivot.resource_id) ?? [];
+      list.push(slug as HolisticPillar);
+      resourcePillars.set(pivot.resource_id, list);
+    });
+
+    return rows.map((row) => mapResourceRow(row, resourcePillars.get(row.id)));
+  } catch (error) {
+    console.error('[resources] Failed to load resources (handled):', error);
+    return [];
+  }
 }
 
 function mapResourceRow(row: ResourceRow, pillars?: HolisticPillar[]): ResourceMeta {

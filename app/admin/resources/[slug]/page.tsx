@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 interface AdminResourceEditPageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export default async function AdminResourceEditPage({ params }: AdminResourceEditPageProps) {
@@ -18,7 +18,8 @@ export default async function AdminResourceEditPage({ params }: AdminResourceEdi
     redirect('/');
   }
 
-  const resource = await getResourceForEdit(params.slug);
+  const { slug } = await params;
+  const resource = await getResourceForEdit(slug);
   if (!resource) {
     notFound();
   }

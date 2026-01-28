@@ -3,6 +3,7 @@
 import React, { useLayoutEffect, useRef, useCallback } from 'react';
 import type { ReactNode } from "react";
 import Lenis from 'lenis';
+import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider';
 
 export interface ScrollStackItemProps {
     itemClassName?: string;
@@ -214,8 +215,20 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
         updateCardTransforms();
     }, [updateCardTransforms]);
 
+    const { lenis: globalLenis } = useSmoothScroll();
+
     const setupLenis = useCallback(() => {
         if (useWindowScroll) {
+            // Use global lenis if available
+            if (globalLenis) {
+                lenisRef.current = globalLenis;
+                globalLenis.on('scroll', handleScroll);
+                // We don't manage the RAF for global lenis, the provider does
+                return globalLenis;
+            }
+
+            // Fallback: This path should ideally not be hit if provider is working, 
+            // but just in case, we create one but log a warning or it might conflict
             const lenis = new Lenis({
                 duration: 1.2,
                 easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -268,7 +281,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
             lenisRef.current = lenis;
             return lenis;
         }
-    }, [handleScroll, useWindowScroll]);
+    }, [handleScroll, useWindowScroll, globalLenis]);
 
     useLayoutEffect(() => {
         if (!useWindowScroll && !scrollerRef.current) return;
@@ -303,7 +316,13 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
                 cancelAnimationFrame(animationFrameRef.current);
             }
             if (lenisRef.current) {
-                lenisRef.current.destroy();
+                // If we are using the global lenis, just unbind
+                if (globalLenis && lenisRef.current === globalLenis) {
+                    globalLenis.off('scroll', handleScroll);
+                } else {
+                    // If we created a local instance, destroy it
+                    lenisRef.current.destroy();
+                }
             }
             stackCompletedRef.current = false;
             cardsRef.current = [];

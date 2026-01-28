@@ -10,8 +10,11 @@ const withMDX = createMDX({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable features for Next.js 16
+
+  turbopack: {},
   experimental: {
-    mdxRs: true
+    mdxRs: true,
   },
   pageExtensions: ['ts', 'tsx', 'mdx'],
   images: {

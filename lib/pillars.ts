@@ -110,3 +110,44 @@ export function getPillar(id: HolisticPillar): PillarDefinition | undefined {
 }
 
 export const PILLAR_IDS: HolisticPillar[] = HOLISTIC_PILLARS.map((pillar) => pillar.id);
+
+// ---------------------------------------------------------------------------
+// Meta-Categories (groupings of pillars for simplified UX)
+// ---------------------------------------------------------------------------
+
+export type MetaCategoryId = 'body' | 'systems' | 'mindset';
+
+export interface MetaCategory {
+  id: MetaCategoryId;
+  title: string;
+  description: string;
+  pillars: HolisticPillar[];
+}
+
+export const PILLAR_META_CATEGORIES: MetaCategory[] = [
+  {
+    id: 'body',
+    title: 'Regulate the body',
+    description: 'Energy, sleep, and somatic resets that stabilise the nervous system.',
+    pillars: ['nutrition', 'sleep', 'mind-body']
+  },
+  {
+    id: 'systems',
+    title: 'Refine the systems',
+    description: 'Design workflows, AI guardrails, and tactile buffers that remove friction.',
+    pillars: ['work', 'ai-tools', 'analog-tools']
+  },
+  {
+    id: 'mindset',
+    title: 'Expand the horizon',
+    description: 'Learning, context, and purpose so small routines ladder up to meaning.',
+    pillars: ['neuroplasticity', 'societal-impact', 'purpose']
+  }
+];
+
+/**
+ * Get the meta-category that contains a given pillar.
+ */
+export function getMetaCategory(pillarId: HolisticPillar): MetaCategory | undefined {
+  return PILLAR_META_CATEGORIES.find((cat) => cat.pillars.includes(pillarId));
+}

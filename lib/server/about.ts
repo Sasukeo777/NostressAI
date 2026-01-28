@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import { getSupabaseServiceClient } from '@/lib/supabaseClient';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export interface AboutRecord {
   id?: number;
@@ -30,6 +31,11 @@ async function loadFallbackBody(): Promise<string> {
 }
 
 export async function fetchAboutRecord(): Promise<AboutRecord | null> {
+  // Skip DB fetch during build to prevent crashes
+  if (process.env.npm_lifecycle_event === 'build') {
+    return null;
+  }
+  noStore();
   const supabase = getSupabaseServiceClient();
   const { data, error } = await supabase
     .from('about_content')

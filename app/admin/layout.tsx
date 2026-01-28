@@ -12,7 +12,7 @@ export const metadata = {
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const { user, role } = await getAuthContext();
-  const headerList = headers();
+  const headerList = await headers();
   const rawPath = headerList.get('x-invoke-path') ?? headerList.get('next-url') ?? '';
   const currentPath = rawPath.startsWith('http') ? new URL(rawPath).pathname : rawPath;
   const navItems = [

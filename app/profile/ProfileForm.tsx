@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Loader2, Check, User, Sparkles, Palette, CreditCard } from 'lucide-react';
 import { PRESET_AVATARS } from '@/lib/profile-presets';
 import { useAuth } from '@/lib/auth-context';
-import { HOLISTIC_PILLARS } from '@/lib/pillars';
+import { HOLISTIC_PILLARS, PILLAR_META_CATEGORIES } from '@/lib/pillars';
 import type { AccentChoice, HolisticPillar } from '@/lib/types';
 import { cn } from '@/lib/utils/cn';
 import { useAccentTheme } from '@/lib/accent-theme-context';
@@ -240,39 +240,51 @@ export function ProfileForm({
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {HOLISTIC_PILLARS.map((pillar) => {
-            const active = selectedPillars.includes(pillar.id);
-            return (
-              <label
-                key={pillar.id}
-                className={cn(
-                  "group relative flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition-all duration-200",
-                  active
-                    ? "border-primary-500 bg-primary-50/50 dark:border-primary-400 dark:bg-primary-900/20"
-                    : "border-neutral-200 bg-white/50 hover:border-primary-200 dark:border-white/10 dark:bg-white/5 dark:hover:border-white/20"
-                )}
-              >
-                <input
-                  type="checkbox"
-                  name="favoritePillars"
-                  value={pillar.id}
-                  className="sr-only"
-                  checked={active}
-                  onChange={() => togglePillar(pillar.id)}
-                />
-                <div className={cn(
-                  "flex h-5 w-5 items-center justify-center rounded-full border transition-colors",
-                  active ? "border-primary-500 bg-primary-500 text-white" : "border-neutral-300 dark:border-neutral-600"
-                )}>
-                  {active && <Check className="h-3 w-3" />}
-                </div>
-                <span className={cn("text-sm font-medium", active ? "text-primary-900 dark:text-primary-100" : "text-neutral-600 dark:text-neutral-300")}>
-                  {pillar.name}
-                </span>
-              </label>
-            );
-          })}
+        <div className="space-y-6">
+          {PILLAR_META_CATEGORIES.map((category) => (
+            <div key={category.id} className="space-y-3">
+              <div>
+                <h3 className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">{category.title}</h3>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">{category.description}</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {category.pillars.map((pillarId) => {
+                  const pillar = HOLISTIC_PILLARS.find((p) => p.id === pillarId);
+                  if (!pillar) return null;
+                  const active = selectedPillars.includes(pillar.id);
+                  return (
+                    <label
+                      key={pillar.id}
+                      className={cn(
+                        "group relative flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-all duration-200",
+                        active
+                          ? "border-primary-500 bg-primary-50/50 dark:border-primary-400 dark:bg-primary-900/20"
+                          : "border-neutral-200 bg-white/50 hover:border-primary-200 dark:border-white/10 dark:bg-white/5 dark:hover:border-white/20"
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        name="favoritePillars"
+                        value={pillar.id}
+                        className="sr-only"
+                        checked={active}
+                        onChange={() => togglePillar(pillar.id)}
+                      />
+                      <div className={cn(
+                        "flex h-5 w-5 items-center justify-center rounded-full border transition-colors",
+                        active ? "border-primary-500 bg-primary-500 text-white" : "border-neutral-300 dark:border-neutral-600"
+                      )}>
+                        {active && <Check className="h-3 w-3" />}
+                      </div>
+                      <span className={cn("text-sm font-medium", active ? "text-primary-900 dark:text-primary-100" : "text-neutral-600 dark:text-neutral-300")}>
+                        {pillar.name}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 

@@ -20,9 +20,10 @@ export interface BlogMeta {
   category?: string;
   tags?: string[];
   pillars?: HolisticPillar[];
+  heroImage?: string;
 }
 
-export type ResourceType = 'tip' | 'study';
+export type ResourceType = 'tip' | 'study' | 'tool' | 'audio' | 'book';
 
 export interface ResourceMeta {
   slug: string;

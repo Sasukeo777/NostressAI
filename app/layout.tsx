@@ -11,7 +11,10 @@ import { PlausibleScript } from '@/components/analytics/PlausibleScript';
 import { MarketingScripts } from '@/components/marketing/MarketingScripts';
 import type { HolisticPillar, AccentChoice } from '@/lib/types';
 import { PILLAR_IDS } from '@/lib/pillars';
+import { AuthWrapper } from '@/components/layout/AuthWrapper';
+import { Suspense } from 'react';
 import { AccentThemeProvider } from '@/lib/accent-theme-context';
+import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvider';
 
 const workSans = Work_Sans({
   subsets: ['latin'],
@@ -46,47 +49,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   // Inline script executed before React hydration to persist the chosen theme without flicker
   const themeScript = `(()=>{try{const ls=localStorage.getItem('theme');const mql=window.matchMedia('(prefers-color-scheme: dark)');const wantDark = ls? ls==='dark' : mql.matches; if(wantDark) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); document.documentElement.dataset.theme = wantDark ? 'dark' : 'light';}catch(e){}})();`;
 
-  const supabase = createSupabaseServerComponentClient();
-  const {
-    data: { session }
-  } = await supabase.auth.getSession();
 
-  let initialProfile:
-    | {
-      displayName: string | null;
-      avatarUrl: string | null;
-      role: string | null;
-      favoritePillars: HolisticPillar[];
-      plan: string | null;
-      lightAccent: AccentChoice;
-      darkAccent: AccentChoice;
-    }
-    | null = null;
-
-  const user = session?.user ?? null;
-  if (user) {
-    const { data: profileRow } = await supabase
-      .from('profiles')
-      .select('display_name, avatar_url, role, favorite_pillars, plan, light_accent, dark_accent')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    const favoritePillars = Array.isArray(profileRow?.favorite_pillars)
-      ? (profileRow?.favorite_pillars.filter((pillar): pillar is HolisticPillar =>
-        typeof pillar === 'string' && PILLAR_IDS.includes(pillar as HolisticPillar)
-      ) as HolisticPillar[])
-      : [];
-
-    initialProfile = {
-      displayName: profileRow?.display_name ?? null,
-      avatarUrl: profileRow?.avatar_url ?? null,
-      role: profileRow?.role ?? null,
-      favoritePillars: favoritePillars as HolisticPillar[],
-      plan: profileRow?.plan ?? 'free',
-      lightAccent: (profileRow?.light_accent ?? 'classic') as AccentChoice,
-      darkAccent: (profileRow?.dark_accent ?? 'classic') as AccentChoice
-    };
-  }
 
   return (
     <html lang="en" suppressHydrationWarning className={`${workSans.variable} ${playfair.variable} h-full`}>
@@ -96,20 +59,24 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-full flex flex-col font-sans antialiased bg-neutral-50 dark:bg-neutral-950 text-neutral-700 dark:text-neutral-100 transition-colors duration-300">
-        <AuthProvider initialSession={session} initialProfile={initialProfile}>
-          <AccentThemeProvider>
-            <ConsentProvider>
-              <DockNavbar />
-              <main className="flex-grow flex flex-col relative z-0">
-                {children}
-              </main>
-              <NatureFooter />
-              <CookieConsentBanner />
-              <PlausibleScript />
-              <MarketingScripts />
-            </ConsentProvider>
-          </AccentThemeProvider>
-        </AuthProvider>
+        <Suspense fallback={<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950" />}>
+          <AuthWrapper>
+            <AccentThemeProvider>
+              <SmoothScrollProvider>
+                <ConsentProvider>
+                  <DockNavbar />
+                  <main className="flex-grow flex flex-col relative z-0">
+                    {children}
+                  </main>
+                  <NatureFooter />
+                  <CookieConsentBanner />
+                  <PlausibleScript />
+                  <MarketingScripts />
+                </ConsentProvider>
+              </SmoothScrollProvider>
+            </AccentThemeProvider>
+          </AuthWrapper>
+        </Suspense>
       </body>
     </html>
   );

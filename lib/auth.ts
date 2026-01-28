@@ -9,7 +9,7 @@ export interface AuthContext {
 }
 
 export async function getAuthContext(): Promise<AuthContext> {
-  const supabase = createSupabaseServerComponentClient();
+  const supabase = await createSupabaseServerComponentClient();
   const {
     data: { user }
   } = await supabase.auth.getUser();

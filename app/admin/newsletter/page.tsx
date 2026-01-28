@@ -6,6 +6,8 @@ import { UpdateSignupStatus } from './UpdateSignupStatus';
 import { DeleteSignupButton } from './DeleteSignupButton';
 import { EraseNewsletterByEmail } from './EraseNewsletterByEmail';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Newsletter signups | Admin',
   description: 'Audit newsletter consent records, manage statuses, and fulfil deletion requests.'
@@ -47,11 +49,11 @@ export default async function NewsletterAdminPage({ searchParams }: NewsletterPa
     '/admin/newsletter/export' +
     (search || statusFilter
       ? `?${[
-          search ? `search=${encodeURIComponent(search)}` : null,
-          statusFilter ? `status=${encodeURIComponent(statusFilter)}` : null
-        ]
-          .filter(Boolean)
-          .join('&')}`
+        search ? `search=${encodeURIComponent(search)}` : null,
+        statusFilter ? `status=${encodeURIComponent(statusFilter)}` : null
+      ]
+        .filter(Boolean)
+        .join('&')}`
       : '');
 
   return (

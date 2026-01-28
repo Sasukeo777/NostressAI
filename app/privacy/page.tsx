@@ -161,7 +161,7 @@ export default function PrivacyPolicyPage() {
           Transparency matters. This page explains what personal data we collect, how we use it, and the rights you have as a visitor
           or customer of NoStress AI.
         </p>
-        <p className="text-xs uppercase tracking-[0.3em] text-neutral-400 dark:text-neutral-500">Last updated: {new Date().toISOString().slice(0, 10)}</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-neutral-400 dark:text-neutral-500">Last updated: 2024-12-11</p>
       </header>
 
       <div className="mt-12 space-y-12 max-w-3xl text-[15px] leading-relaxed text-neutral-700 dark:text-neutral-200">
