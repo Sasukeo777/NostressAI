@@ -174,3 +174,10 @@ export async function getAllPosts(): Promise<BlogMeta[]> {
 
   return fetchPostsFromFilesystem();
 }
+
+export async function getPostMeta(slug: string): Promise<BlogMeta | null> {
+  noStore();
+  const posts = await getAllPosts();
+  return posts.find(p => p.slug === slug) ?? null;
+}
+

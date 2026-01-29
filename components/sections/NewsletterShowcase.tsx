@@ -10,7 +10,7 @@ export function NewsletterShowcase() {
         <section className="relative">
             {/* Main container with gradient border effect */}
             <div className="relative rounded-[3rem] p-[1px] bg-gradient-to-br from-primary-200 via-neutral-200 to-accent-200 dark:from-primary-800/50 dark:via-neutral-800 dark:to-accent-800/50 overflow-hidden">
-                <div className="relative rounded-[3rem] bg-white dark:bg-neutral-950 overflow-hidden">
+                <div className="relative rounded-[3rem] bg-neutral-25 dark:bg-neutral-950 overflow-hidden">
 
                     {/* Ambient background effects */}
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-50 via-transparent to-transparent dark:from-primary-950/30" />

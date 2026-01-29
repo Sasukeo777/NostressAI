@@ -117,7 +117,8 @@ export default function HomePage() {
           title="Latest content"
           eyebrow="Blog & Resources"
           items={placeholderArticles}
-          actionLink={{ href: '/blog', label: 'View all →' }}
+          actionLink={{ href: '/blog', label: 'View all' }}
+          variant="blog"
         />
 
         <Timeline data={timelineData} />
@@ -126,14 +127,16 @@ export default function HomePage() {
           title="Courses"
           eyebrow="Programs"
           items={placeholderCourses}
-          actionLink={{ href: '/courses', label: 'See courses →' }}
+          actionLink={{ href: '/courses', label: 'See courses' }}
+          variant="courses"
         />
 
         <ContentGrid
           title="Videos"
           eyebrow="Replays & Demos"
           items={placeholderVideos}
-          actionLink={{ href: '/videos', label: 'More →' }}
+          actionLink={{ href: '/videos', label: 'More' }}
+          variant="videos"
         />
 
         <MotionWrapper variant="scale">

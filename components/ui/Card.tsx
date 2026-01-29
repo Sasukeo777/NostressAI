@@ -70,10 +70,10 @@ export function Card({ title, description, href, badge, footer, className, pilla
       }}
       className={cn(
         'group relative flex h-full flex-col overflow-hidden rounded-2xl transition-all duration-300',
-        // Default visible styling
-        'bg-white dark:bg-neutral-900',
-        'border border-neutral-200/80 dark:border-neutral-800',
-        'shadow-sm hover:shadow-xl hover:shadow-neutral-200/50 dark:hover:shadow-black/30',
+        // Warm visible styling - cream instead of white
+        'bg-neutral-25 dark:bg-neutral-900',
+        'border border-neutral-200/60 dark:border-neutral-800',
+        'shadow-sm hover:shadow-xl hover:shadow-accent-200/30 dark:hover:shadow-black/30',
         'hover:-translate-y-1 hover:border-primary-200 dark:hover:border-primary-800',
         className
       )}

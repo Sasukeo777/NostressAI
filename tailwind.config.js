@@ -42,20 +42,20 @@ module.exports = {
           900: '#663a2b',
           950: '#371d16',
         },
-        // Sophisticated Neutrals
+        // Warm Sophisticated Neutrals (Cream/Sand undertones)
         neutral: {
-          25: '#fcfcfc',
-          50: '#f9fafb',
-          100: '#f3f4f6',
-          200: '#e5e7eb',
-          300: '#d1d5db',
-          400: '#9ca3af',
-          500: '#6b7280',
-          600: '#4b5563',
-          700: '#544b46',
-          800: '#1f2937',
-          900: '#111827',
-          950: '#030712',
+          25: '#fefdfb',   // Warm white
+          50: '#faf9f7',   // Cream
+          100: '#f5f3f0',  // Light sand
+          200: '#e8e4df',  // Warm gray
+          300: '#d4cfc7',  // Sand
+          400: '#a8a196',  // Warm medium
+          500: '#7a7267',  // Warm gray-brown
+          600: '#5c554c',  // Warm dark
+          700: '#44403a',  // Dark warm
+          800: '#292524',  // Warm charcoal
+          900: '#1c1917',  // Warm black
+          950: '#0c0a09',  // Deep warm black
         },
         // Vibrant Functional Colors
         success: '#3b8c7e', // Deep Teal
